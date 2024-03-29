@@ -7,7 +7,7 @@ from .models import Division,TeamInDivision, Team
 from match.models import MatchTable
 from .serializers import DivisionSerializer,TeamInDivisionSerializer
 from rest_framework.decorators import action
-
+from collections import defaultdict
 
 
 class DivisionView(viewsets.ViewSet):
@@ -40,26 +40,31 @@ class Tree:
         self.available = 0
         self.leafAmount = 1
 
-    def get_win_rate(team_name):
-        win_rate = MatchTable.objects.filter(
-            status='f',#finished
-            team1Name__teamName=team_name
-        ).annotate(#adds addition field 'win'
-            win=Case(
-                When(team1Name__teamName=team_name, then=F('team1Wins')> F('team2Wins')),
-                When(team2Name__teamName=team_name, then=F('team2Wins') > F('team1Wins')),
-                default=0,
-                output_field=FloatField()
-            )
-        ).aggregate(#calculations
-            total_games=Count('id'),
-            total_wins=Sum('win')
-        )
+    def CalculateWinRate(self,TeamList):#total wins/total games
+        team_win_rates = defaultdict(float)
 
-        if win_rate['total_games'] == 0:#could be replaced with survay
-            return 0.0  # Prevent division by zero
+        for teamInDivision in TeamList:
+            team = teamInDivision.team #foreign key to team table
+            #----------getting the total games---------------------------------
+            totalGameTeam1 = MatchTable.objects.filter(team1Name =team).count()
+            totalGameTeam2 = MatchTable.objects.filter(team2Name =team).count()
+            totalGames = totalGameTeam1 + totalGameTeam2
 
-        return win_rate['total_wins'] / win_rate['total_games']
+            #--------------Getting total wins------------------------------------
+            # Count wins by checking name and if team has higher score than other team on same row
+            team1Wins = MatchTable.objects.filter(team1Name=team, team1Wins__gt=F('team2Wins')).count()
+            team2Wins = MatchTable.objects.filter(team2Name=team, team2Wins__gt=F('team1Wins')).count()
+            totalWins = team1Wins + team2Wins
+
+            #---------------calculating the win rate------------------------------
+            winRate = 0
+            if totalGames >0:
+                winRate = totalWins /totalGames
+            team_win_rates[team] = winRate
+            #sorts them
+            sortedTeams = sorted(team_win_rates.items(),key=lambda X: X[1])
+
+            return [team for team, _ in sortedTeams]
 
     #should work as passbyReference
     def assignPosition(self, team_list):
@@ -76,6 +81,7 @@ class Tree:
                 self.positionNum += 1
                 self.available = 0
                 self.leafAmount *= 2
+                
     def fixTree(self,team_list):# goes through entire tree to fix
         #keeps intergrety of tree without changing it based on winrate
         #need to reset the variables in trees first
@@ -149,7 +155,7 @@ class TeamInDivisionView(viewsets.ViewSet):
         TeamList = list(TeamInDivision.objects.filter(division=division))#querrySet into list
         tree = Tree()
         
-        tree.assignPosition(TeamList)
+        tree.assignPosition(tree.CalculateWinRate(TeamList))
         for team in TeamList: #saves each teamObject to the database
             team.save()
 
