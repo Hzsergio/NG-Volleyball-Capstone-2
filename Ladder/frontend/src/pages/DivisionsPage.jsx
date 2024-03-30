@@ -1,7 +1,3 @@
-import { useSelector } from 'react-redux'  
-// const { userInfo } = useSelector((state) => state.auth)
-// DivisionsPage.jsx
-// DivisionsPage.jsx
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
