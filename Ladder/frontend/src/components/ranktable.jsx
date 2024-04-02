@@ -33,24 +33,31 @@ function createData(name, calories, fat, carbs, protein) {
 }
 
 const rows = [
-  createData('Frozen yoghurt', 159, 6.0, 24, 4.0),
-  createData('Ice cream sandwich', 237, 9.0, 37, 4.3),
-  createData('Eclair', 262, 16.0, 24, 6.0),
-  createData('Cupcake', 305, 3.7, 67, 4.3),
-  createData('Gingerbread', 356, 16.0, 49, 3.9),
+  createData('Tigers', 1, 3, 0, 1.0),
+  createData('Icees', 2, 2, 1, .66),
+  createData('Falcons', 3, 2, 1, .66),
+  createData('Cupcakes', 4, 1, 2, .33),
+  createData('Vikings', 5, 0, 3, .00),
 ];
+
+const CenteredTableContainer = styled(TableContainer)({
+  display: 'flex',
+  justifyContent: 'center',
+  maxWidth: '70%', // Adjust as needed
+  margin: '0 auto', // Center horizontally
+});
 
 export default function CustomizedTables() {
   return (
-    <TableContainer component={Paper}>
-      <Table sx={{ minWidth: 700 }} aria-label="customized table">
+    <CenteredTableContainer component={Paper}>
+      <Table aria-label="customized table">
         <TableHead>
           <TableRow>
-            <StyledTableCell>Dessert (100g serving)</StyledTableCell>
-            <StyledTableCell align="right">Calories</StyledTableCell>
-            <StyledTableCell align="right">Fat&nbsp;(g)</StyledTableCell>
-            <StyledTableCell align="right">Carbs&nbsp;(g)</StyledTableCell>
-            <StyledTableCell align="right">Protein&nbsp;(g)</StyledTableCell>
+            <StyledTableCell>Team</StyledTableCell>
+            <StyledTableCell align="right">Rank</StyledTableCell>
+            <StyledTableCell align="right">Wins</StyledTableCell>
+            <StyledTableCell align="right">Loses</StyledTableCell>
+            <StyledTableCell align="right">Ratio</StyledTableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -67,6 +74,6 @@ export default function CustomizedTables() {
           ))}
         </TableBody>
       </Table>
-    </TableContainer>
+    </CenteredTableContainer>
   );
 }
