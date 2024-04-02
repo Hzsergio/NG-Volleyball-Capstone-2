@@ -53,3 +53,6 @@ Temporary Items
 venv/
 
 __pycache__
+__pycache__/
+Ladder/backend/divisions/migrations/__pycache__/
+Ladder/backend/match/__pycache__/

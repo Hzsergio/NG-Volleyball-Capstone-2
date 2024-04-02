@@ -56,7 +56,7 @@ const DivisionDetailsPage = () => {
         ))}
       </ul>
       
-      <Link to="/joindivision">
+      <Link to={`/joindivision/${name}`}>
         <button className="btn btn-primary">Join Division</button>
       </Link>
   
