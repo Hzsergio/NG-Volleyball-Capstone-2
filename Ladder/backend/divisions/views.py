@@ -2,7 +2,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from rest_framework import viewsets, permissions, status
 
-from django.db.models import Count,Sum,Case,When,FloatField, F
+from django.db.models import F
 from .models import Division,TeamInDivision, Team
 from match.models import MatchTable
 from .serializers import DivisionSerializer,TeamInDivisionSerializer
@@ -81,13 +81,7 @@ class Tree:
                 self.positionNum += 1
                 self.available = 0
                 self.leafAmount *= 2
-                
-    def fixTree(self,team_list):# goes through entire tree to fix
-        #keeps intergrety of tree without changing it based on winrate
-        #need to reset the variables in trees first
-        self.assignPosition(team_list)
-
-        
+     
 class TeamInDivisionView(viewsets.ViewSet):
     queryset = TeamInDivision.objects.all()
     serializer_class = TeamInDivisionSerializer
@@ -151,8 +145,8 @@ class TeamInDivisionView(viewsets.ViewSet):
     
     @action(detail=False, methods=['POST'], url_path='assign-positions/(?P<division_name>[^/.]+)')
     def assign_positions(self, request, division_name=None):
-        division = get_object_or_404(Division, name=division_name)
-        TeamList = list(TeamInDivision.objects.filter(division=division))#querrySet into list
+        division404 = get_object_or_404(Division, name=division_name)
+        TeamList = list(TeamInDivision.objects.filter(division=division404))#querrySet into list
         tree = Tree()
         
         tree.assignPosition(tree.CalculateWinRate(TeamList))
@@ -160,3 +154,35 @@ class TeamInDivisionView(viewsets.ViewSet):
             team.save()
 
         return Response({'message': 'Positions assigned successfully.'})
+    
+    #could do a boolen to condense these two together
+    @action(detail=False, methods=['POST'], url_path='remake-tree/(?P<division_name>[^/.]+)')
+    def remake_tree(self, request, division_name=None):
+        division404 = get_object_or_404(Division, name=division_name)
+        TeamList = list(TeamInDivision.objects.filter(division=division404))#querrySet into list
+        tree = Tree()
+        #basically the same as assign_position but without recalibration winrate
+        tree.assignPosition(TeamList)
+        for team in TeamList: #saves each teamObject to the database
+            team.save()
+
+        return Response({'message': 'Positions assigned successfully.'})
+    
+    #currently gets entire row for TeamInDivision but it does work
+    @action(detail=False, methods=['GET'], url_path='challengeable-teams/(?P<division_name>[^/.]+)/(?P<team_name>[^/.]+)')
+    def challengeable_teams(self, request, division_name=None,team_name=None):
+        division404 = get_object_or_404(Division, name=division_name)
+        team404 = get_object_or_404(Team, name=team_name)
+        team_in_division = get_object_or_404(TeamInDivision, division=division404, team=team404)
+        current_position = team_in_division.position
+
+        #this returns the team primary key -currently numbers
+        challengeables = TeamInDivision.objects.filter(division=division404,position=current_position - 1).values_list('team__name', flat=True)
+        return Response(challengeables)
+    
+        #this version returns the whole row
+        #challengeables = TeamInDivision.objects.filter(division=division404,position=current_position -1)
+        #serializer = self.serializer_class(challengeables, many=True)
+        #serializer = self.serializer_class(challengeables, many=True)
+        #return Response(serializer.data)
+    
