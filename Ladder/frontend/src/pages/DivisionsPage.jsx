@@ -1,7 +1,3 @@
-import { useSelector } from 'react-redux'  
-// const { userInfo } = useSelector((state) => state.auth)
-// DivisionsPage.jsx
-// DivisionsPage.jsx
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
@@ -36,9 +32,9 @@ const DivisionsPage = () => {
         ))}
       </div>
 
-      <button className="btn btn-primary" type="submit">
-          Create Division
-        </button>
+    <Link to="/createdivision">
+      <button className="btn btn-primary">Create Division</button>
+    </Link>
     </div>
   );
 };

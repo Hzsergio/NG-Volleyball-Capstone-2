@@ -1,6 +1,3 @@
-import { useSelector } from 'react-redux'  
-// const { userInfo } = useSelector((state) => state.auth)
-
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
@@ -29,7 +26,7 @@ const TeamPage = () => {
         {teams.map((team) => (
           <div key={team.name} className="division-box">
             <Link to={`/team/${team.id}`} style={{ color: 'var(--color-white)' }}>
-              <strong>{team.name}</strong> - Created by: {team.captain_username}
+              <strong>{team.name}</strong> <br/> Created by: {team.captain_username}
             </Link>
           </div>
         ))}

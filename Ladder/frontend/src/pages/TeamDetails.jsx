@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { toast } from 'react-toastify'
 import { useNavigate} from 'react-router-dom'
-
+import { getUserInfo } from '../features/auth/authSlice'; // Import the getUserInfo action
 
 const TeamDetailsPage = () => {
   const [teamDetails, setTeamDetails] = useState({});
@@ -13,6 +13,8 @@ const TeamDetailsPage = () => {
   const { id } = useParams();
   const { userInfo } = useSelector((state) => state.auth);
   const navigate = useNavigate()
+  const dispatch = useDispatch(); // Get the dispatch function
+
 
 
   useEffect(() => {
@@ -30,7 +32,7 @@ const TeamDetailsPage = () => {
         setLoading(false);
       }
     };
-
+    dispatch(getUserInfo());
     fetchTeamDetails();
   }, [id]);
 

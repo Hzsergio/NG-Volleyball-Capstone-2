@@ -1,17 +1,23 @@
 // pages/CreateTeamPage.jsx
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useSelector } from 'react-redux'; 
+import { useSelector, useDispatch } from 'react-redux'; 
 import { useNavigate} from 'react-router-dom'
 import { toast } from 'react-toastify'
+import { getUserInfo } from '../features/auth/authSlice'
 
 
 
 const CreateTeamPage = () => {
+  const dispatch = useDispatch()
   const [name, setName] = useState('');
   const { userInfo } = useSelector((state) => state.auth);
   const navigate = useNavigate()
 
+  useEffect(() => {
+    // Fetch user information when the component mounts
+    dispatch(getUserInfo());
+  }, []); // Only run the effect once when the component mounts
 
   const handleSubmit = (e) => {
     e.preventDefault();

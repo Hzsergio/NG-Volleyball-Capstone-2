@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch} from 'react-redux';
 import axios from 'axios';
+import { getUserInfo } from '../features/auth/authSlice'
+
 
 const UpdateProfilePage = () => {
+  const dispatch = useDispatch()
   const { userInfo } = useSelector((state) => state.auth);
   const [userData, setUserData] = useState({
     first_name: '',
@@ -22,6 +25,8 @@ const UpdateProfilePage = () => {
       .catch((error) => {
         console.error('Error fetching user data:', error);
       });
+
+      dispatch(getUserInfo())
   }, [userInfo.id]);
 
   const handleUsernameChange = (newUsername) => {

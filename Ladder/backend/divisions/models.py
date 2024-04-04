@@ -21,7 +21,7 @@ class Division(models.Model):
 class TeamInDivision(models.Model):
     division = models.ForeignKey(Division, on_delete=models.CASCADE)
     team = models.ForeignKey(Team, on_delete=models.CASCADE)
-    position = models.PositiveIntegerField()
+    position = models.PositiveIntegerField(null=True)
     class Meta:
         unique_together = ('division', 'team')
 
