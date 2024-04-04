@@ -14,7 +14,7 @@ class MatchTable(models.Model):
     team2Wins = models.IntegerField(default=0)
     
     class Status(models.TextChoices):
-       INPROGRESS = 'i', 'inProgress'
+       INPROGRESS = 'i', 'inProgress' 
        SCHEDULED = 's', 'scheduled'
        VOID = 'v', 'void'
        FINISHED = 'f', 'finished'

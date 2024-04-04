@@ -64,7 +64,7 @@ class Tree:
             #sorts them
             sortedTeams = sorted(team_win_rates.items(),key=lambda X: X[1])
 
-            return [team for team, _ in sortedTeams]
+            return sortedTeams
 
     #should work as passbyReference
     def assignPosition(self, team_list):
@@ -148,7 +148,7 @@ class TeamInDivisionView(viewsets.ViewSet):
         division404 = get_object_or_404(Division, name=division_name)
         TeamList = list(TeamInDivision.objects.filter(division=division404))#querrySet into list
         tree = Tree()
-        
+        foo = tree.CalculateWinRate(TeamList)
         tree.assignPosition(tree.CalculateWinRate(TeamList))
         for team in TeamList: #saves each teamObject to the database
             team.save()
@@ -168,7 +168,7 @@ class TeamInDivisionView(viewsets.ViewSet):
 
         return Response({'message': 'Positions assigned successfully.'})
     
-    #currently gets entire row for TeamInDivision but it does work
+    
     @action(detail=False, methods=['GET'], url_path='challengeable-teams/(?P<division_name>[^/.]+)/(?P<team_name>[^/.]+)')
     def challengeable_teams(self, request, division_name=None,team_name=None):
         division404 = get_object_or_404(Division, name=division_name)
@@ -176,7 +176,7 @@ class TeamInDivisionView(viewsets.ViewSet):
         team_in_division = get_object_or_404(TeamInDivision, division=division404, team=team404)
         current_position = team_in_division.position
 
-        #this returns the team primary key -currently numbers
+        
         challengeables = TeamInDivision.objects.filter(division=division404,position=current_position - 1).values_list('team__name', flat=True)
         return Response(challengeables)
     
