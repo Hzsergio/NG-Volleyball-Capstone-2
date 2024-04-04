@@ -32,19 +32,19 @@ class MatchTableView(viewsets.ViewSet):
         return Response(serializer.data)
     
     #to get the match result with optional division
-    @action(detail=False, methods=['GET'], url_path=r'match-results/(?P<team_name>[^/.]+)/(?P<division_name>[^/.]+)?')
-    def match_results(self, request, team_name=None,division_name=None,):
+    @action(detail=False, methods=['GET'], url_path=r'match-results/(?P<team_name>[^/.]+)(?:/(?P<division_name>[^/.]+))?')
+    def match_results(self, request, team_name=None,division_name=None):
         team = get_object_or_404(Team, name=team_name)
 
         # Filter MatchTable if team1 or team2
-        match_results = MatchTable.objects.filter(team1Name=team) | \
+        match_result = MatchTable.objects.filter(team1Name=team) | \
                         MatchTable.objects.filter(team2Name=team)
         if division_name:
             division = get_object_or_404(Division, name=division_name)
             match_result = MatchTable.objects.filter(division=division)
 
         # Serialize match results excluding 'id' and 'countdown'
-        serializer = self.serializer_class(match_results, many=True, exclude=['id', 'countDown'])
+        serializer = self.serializer_class(match_result, many=True)#, exclude=['id', 'countDown'])
         return Response(serializer.data)
 
 class CourtScheduleView(viewsets.ViewSet):

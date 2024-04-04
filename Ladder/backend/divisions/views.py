@@ -64,9 +64,8 @@ class Tree:
                 winRate = totalWins /totalGames
             team_win_rates[team] = winRate
             #sorts them
-            sortedTeams = sorted(team_win_rates.items(),key=lambda X: X[1])
-
-            return [team for team, _ in sortedTeams]
+        sortedTeams = sorted(TeamList, key=lambda team: team_win_rates[team.team])
+        return sortedTeams
 
     #should work as passbyReference
     def assignPosition(self, team_list):
@@ -181,8 +180,7 @@ class TeamInDivisionView(viewsets.ViewSet):
         TeamList = list(TeamInDivision.objects.filter(division=division404))#querrySet into list
         tree = Tree()
 
-        # tree.assignPosition(tree.CalculateWinRate(TeamList))
-        tree.assignPosition(TeamList)
+        tree.assignPosition(tree.CalculateWinRate(TeamList))
         for team in TeamList: #saves each teamObject to the database
             team.save()
 
