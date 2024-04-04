@@ -1,9 +1,11 @@
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from rest_framework import viewsets, permissions, status
+from rest_framework.decorators import api_view
 
 from django.db.models import F
-from .models import Division,TeamInDivision, Team
+from .models import Division,TeamInDivision, Team, User
 from match.models import MatchTable
 from .serializers import DivisionSerializer,TeamInDivisionSerializer
 from rest_framework.decorators import action
@@ -127,6 +129,36 @@ class TeamInDivisionView(viewsets.ViewSet):
             return Response({'error': f'Division {division_name} does not exist.'}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+    #Checks if the user is a captain of one of the teams in the division
+    @action(detail=False, methods=['GET'], url_path=r'check-user-captain/(?P<division_name>[^/.]+)/(?P<user_id>\d+)')
+    def check_user_captain(self, request, division_name, user_id):
+        try:
+            # Get all teams in the division
+            teams_in_division = TeamInDivision.objects.filter(division__name=division_name)
+
+            # Check if the user is a captain of any team in the division
+            is_captain = any(team.team.captain_id == int(user_id) for team in teams_in_division)
+
+            return Response({'isCaptain': is_captain})
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+    #Checks to see if the current user is the admin of the division    
+    @action(detail=False, methods=['GET'], url_path='check-admin/(?P<division_name>[^/.]+)/(?P<user_id>\d+)')
+    def check_admin(self, request, division_name, user_id):
+        try:
+            # Get the division with the specified name
+            division = Division.objects.get(name=division_name)
+            print(division.admin, user_id)
+            # Check if the user is the admin of the division
+            is_admin = division.admin.id == int(user_id)
+
+            return Response({'is_admin': is_admin})
+        except Division.DoesNotExist:
+            return Response({'error': 'Division does not exist'}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def get_queryset(self):
         division_name = self.kwargs['division_name']
@@ -148,8 +180,9 @@ class TeamInDivisionView(viewsets.ViewSet):
         division404 = get_object_or_404(Division, name=division_name)
         TeamList = list(TeamInDivision.objects.filter(division=division404))#querrySet into list
         tree = Tree()
-        
-        tree.assignPosition(tree.CalculateWinRate(TeamList))
+
+        # tree.assignPosition(tree.CalculateWinRate(TeamList))
+        tree.assignPosition(TeamList)
         for team in TeamList: #saves each teamObject to the database
             team.save()
 
