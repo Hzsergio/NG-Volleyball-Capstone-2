@@ -6,6 +6,8 @@ from rest_framework.response import Response
 from rest_framework import viewsets, permissions, status
 from rest_framework.decorators import action
 from collections import defaultdict
+import json
+from django.http import JsonResponse
 
 # Create your views here.
 class MatchTableView(viewsets.ViewSet):
@@ -46,6 +48,37 @@ class MatchTableView(viewsets.ViewSet):
         # Serialize match results excluding 'id' and 'countdown'
         serializer = self.serializer_class(match_result, many=True)#, exclude=['id', 'countDown'])
         return Response(serializer.data)
+    
+    #used for submiting result, void,finished. 
+    @action(detail=False, methods=['POST'], url_path=r'submit-results/(?P<match_id>[^/.]+)')
+    def submit_results(self, request, match_id=None):
+        try:
+            match = get_object_or_404(MatchTable, id=match_id)
+            data = request.data
+            
+            # Get the values from the request data
+            team1Wins = data.get('team1Wins')
+            team2Wins = data.get('team2Wins')
+            status = data.get('status')
+
+            # Update the MatchTable object if the values are provided
+            if team1Wins is not None:
+                match.team1Wins = team1Wins
+            if team2Wins is not None:
+                match.team2Wins = team2Wins
+            if status:
+                match.status = status
+
+            match.save() # Save the changes
+            return JsonResponse({'message': 'Match results updated successfully.'})
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=400)
+        #need to change teamscore 1,2, status:void,finished in json
+        # {
+        #     "team1Wins": 3,
+        #     "team2Wins": 1,
+        #     "status": "f"
+        # }
 
 class CourtScheduleView(viewsets.ViewSet):
     queryset = CourtSchedule.objects.all()
