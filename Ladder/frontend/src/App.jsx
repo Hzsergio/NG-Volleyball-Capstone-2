@@ -19,6 +19,8 @@ import TeamPage from "./pages/TeamsPage";
 import TeamDetailsPage from "./pages/TeamDetails";
 import JoinDivisionPage from "./pages/JoinDivision";
 import CreateDivisionPage from "./pages/CreateDivisionPage";
+import CreateChallenge from "./pages/CreateChallenge";
+import Calendar from "./pages/Calendar";
 
 function App() {
   return (
@@ -43,6 +45,11 @@ function App() {
           <Route path="/allteams" element={<TeamPage />} />
           <Route path="/team/:id" element={<TeamDetailsPage />} />
           <Route path="/joindivision/:divisionName" element={<JoinDivisionPage />} />
+          <Route path="/challenge/:name/:team1/:team2" element={<CreateChallenge />} />
+          <Route path="/schedule" element={<Calendar />} />
+
+
+
 
 
 

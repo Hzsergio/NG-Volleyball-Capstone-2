@@ -3,6 +3,8 @@ import axios from 'axios';
 import { useSelector, useDispatch } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { getUserInfo } from '../features/auth/authSlice'; // Import the getUserInfo action
+import GetChallenges from '../components/GetChallenges';
+
 
 const Dashboard = () => {
   const [userTeams, setUserTeams] = useState([]);
@@ -46,6 +48,9 @@ const Dashboard = () => {
       <Link to="/createteam">
         <button className="btn btn-primary">Create Team</button>
       </Link>
+
+      <GetChallenges/>
+      
     </div>
   );
 };
