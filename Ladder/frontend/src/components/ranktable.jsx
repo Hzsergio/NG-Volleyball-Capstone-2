@@ -28,8 +28,8 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   },
 }));
 
-function createData(name, calories, fat, carbs, protein) {
-  return { name, calories, fat, carbs, protein };
+function createData(name, rank, wins, loses, ratio) {
+  return { name, rank, wins, loses, ratio };
 }
 
 const rows = [
@@ -66,10 +66,10 @@ export default function CustomizedTables() {
               <StyledTableCell component="th" scope="row">
                 {row.name}
               </StyledTableCell>
-              <StyledTableCell align="right">{row.calories}</StyledTableCell>
-              <StyledTableCell align="right">{row.fat}</StyledTableCell>
-              <StyledTableCell align="right">{row.carbs}</StyledTableCell>
-              <StyledTableCell align="right">{row.protein}</StyledTableCell>
+              <StyledTableCell align="right">{row.rank}</StyledTableCell>
+              <StyledTableCell align="right">{row.wins}</StyledTableCell>
+              <StyledTableCell align="right">{row.loses}</StyledTableCell>
+              <StyledTableCell align="right">{row.ratio}</StyledTableCell>
             </StyledTableRow>
           ))}
         </TableBody>
