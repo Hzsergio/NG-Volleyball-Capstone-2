@@ -1,6 +1,8 @@
 from django.shortcuts import get_object_or_404
 from .models import MatchTable,CourtSchedule
 from divisions.models import TeamInDivision, Division
+from django.shortcuts import get_object_or_404
+from rest_framework.decorators import api_view
 from .serializers import *
 from rest_framework.response import Response
 from rest_framework import viewsets, permissions, status
@@ -38,6 +40,7 @@ class MatchTableView(viewsets.ViewSet):
         serializer = self.serializer_class(project)
         return Response(serializer.data)
     
+
     #to get the match result with optional division
     @action(detail=False, methods=['GET'], url_path=r'match-results/(?P<team_name>[^/.]+)(?:/(?P<division_name>[^/.]+))?')
     def match_results(self, request, team_name=None,division_name=None):
@@ -84,6 +87,7 @@ class MatchTableView(viewsets.ViewSet):
         #     "team2Wins": 1,
         #     "status": "f"
         # }
+
     @action(detail=False, methods=['GET'], url_path=r'user_challenges/(?P<user_id>\d+)')
     def user_challenges(self, request, user_id=None):
         # Get teams associated with the user
@@ -112,6 +116,7 @@ class MatchTableView(viewsets.ViewSet):
         
         serializer = MatchTableSerializer(match_instance)
         return Response(serializer.data)
+
 
 class CourtScheduleView(viewsets.ViewSet):
     queryset = CourtSchedule.objects.all()
