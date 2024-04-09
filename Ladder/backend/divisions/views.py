@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework import viewsets, permissions, status
 from rest_framework.decorators import api_view
 
-from django.db.models import F
+from django.db.models import F,Q
 from .models import Division,TeamInDivision, Team, User
 from match.models import MatchTable
 from .serializers import DivisionSerializer,TeamInDivisionSerializer
@@ -59,14 +59,13 @@ class Tree:
             totalWins = team1Wins + team2Wins
 
             #---------------calculating the win rate------------------------------
-            winRate = 0
+            winRate = 0 #survay would go here
             if totalGames >0:
                 winRate = totalWins /totalGames
             team_win_rates[team] = winRate
             #sorts them
-            sortedTeams = sorted(team_win_rates.items(),key=lambda X: X[1])
-
-            return [team for team, _ in sortedTeams]
+        sortedTeams = sorted(TeamList, key=lambda team: team_win_rates[team.team])
+        return sortedTeams
 
     #should work as passbyReference
     def assignPosition(self, team_list):
@@ -197,8 +196,7 @@ class TeamInDivisionView(viewsets.ViewSet):
         TeamList = list(TeamInDivision.objects.filter(division=division404))#querrySet into list
         tree = Tree()
 
-        # tree.assignPosition(tree.CalculateWinRate(TeamList))
-        tree.assignPosition(TeamList)
+        tree.assignPosition(tree.CalculateWinRate(TeamList))
         for team in TeamList: #saves each teamObject to the database
             team.save()
 
@@ -217,7 +215,7 @@ class TeamInDivisionView(viewsets.ViewSet):
 
         return Response({'message': 'Positions assigned successfully.'})
     
-    #currently gets entire row for TeamInDivision but it does work
+    # need to check match status of other team -need to test
     @action(detail=False, methods=['GET'], url_path='challengeable-teams/(?P<division_name>[^/.]+)/(?P<team_name>[^/.]+)')
     def challengeable_teams(self, request, division_name=None,team_name=None):
         division404 = get_object_or_404(Division, name=division_name)
@@ -225,8 +223,17 @@ class TeamInDivisionView(viewsets.ViewSet):
         team_in_division = get_object_or_404(TeamInDivision, division=division404, team=team404)
         current_position = team_in_division.position
 
-        #this returns the team primary key -currently numbers
+        #this returns avaialbe challengable teams
         challengeables = TeamInDivision.objects.filter(division=division404,position=current_position - 1).values_list('team__name', flat=True)
+
+        #removes all the challengeable teams that are in a match
+        challengeables = challengeables.exclude(
+            Q(team__team1_matches__status=MatchTable.Status.INPROGRESS) |
+            Q(team__team2_matches__status=MatchTable.Status.INPROGRESS) |
+            Q(team__team1_matches__status=MatchTable.Status.SCHEDULED) |
+            Q(team__team2_matches__status=MatchTable.Status.SCHEDULED)
+        ).values_list('team__name', flat=True)
+
         return Response(challengeables)
     
         #this version returns the whole row
