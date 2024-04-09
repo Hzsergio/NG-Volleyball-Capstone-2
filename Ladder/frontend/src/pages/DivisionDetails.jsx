@@ -7,6 +7,7 @@ import { getUserInfo } from '../features/auth/authSlice'; // Import the getUserI
 
 import CheckUserCaptain from '../components/CheckUserCaptain' // Import the CheckUserCaptain component
 import CheckDivisionAdmin from '../components/CheckDivisionAdmin';
+import CustomizedTables from '../components/ranktable';
 
 const DivisionDetailsPage = () => {
   const [divisionDetails, setDivisionDetails] = useState([]);
@@ -45,6 +46,8 @@ const DivisionDetailsPage = () => {
           ))}
         </ul>
       </div>
+      <CustomizedTables/>
+
       {/* Use the CheckUserCaptain component */}
       <CheckUserCaptain userId={userInfo.id} divisionName={name} />
       
@@ -53,13 +56,6 @@ const DivisionDetailsPage = () => {
       <Link to={`/joindivision/${name}`}>
         <button className="btn btn-primary">Join Division</button>
       </Link>
-<<<<<<< HEAD
-  
-          <CustomizedTables />
-=======
-
-
->>>>>>> Adding-Ladder-Algorithm
     </div>
   );
 };
