@@ -32,9 +32,9 @@ const DivisionsPage = () => {
         ))}
       </div>
 
-      <button className="btn btn-primary" type="submit">
-          Create Division
-        </button>
+    <Link to="/createdivision">
+      <button className="btn btn-primary">Create Division</button>
+    </Link>
     </div>
   );
 };
