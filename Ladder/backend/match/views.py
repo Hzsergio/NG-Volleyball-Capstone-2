@@ -37,6 +37,14 @@ class MatchTableView(viewsets.ViewSet):
         serializer = self.serializer_class(project)
         return Response(serializer.data)
     
+    def delete(self, request, pk):
+        try:
+            challenge = MatchTable.objects.get(pk=pk)
+            challenge.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        except MatchTable.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+    
     @action(detail=False, methods=['GET'], url_path=r'user_challenges/(?P<user_id>\d+)')
     def user_challenges(self, request, user_id=None):
         # Get teams associated with the user

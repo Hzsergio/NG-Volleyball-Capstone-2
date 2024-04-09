@@ -24,8 +24,8 @@ const TeamPage = () => {
       <h1 className="main__title" >Teams</h1>
       <div className="division-container">
         {teams.map((team) => (
-          <div key={team.name} className="division-box">
-            <Link to={`/team/${team.id}`} style={{ color: 'var(--color-white)' }}>
+          <div key={team.name} className="team-box">
+            <Link to={`/team/${team.id}`}>
               <strong>{team.name}</strong> <br/> Created by: {team.captain_username}
             </Link>
           </div>

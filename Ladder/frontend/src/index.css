@@ -12,7 +12,8 @@
 }
 
 :root {
-  --color-bg: #1f1f38;
+  --color-bg: #1f1f38; 
+  --color-bg2: #f8f8f8;
   --color-bg-variant: #28284f;
   --color-primary: #007bff;
   /* Blue */
@@ -39,11 +40,20 @@
 
 body {
   font-family: 'Poppins', sans-serif;
-  background: var(--color-bg);
-  color: var(--color-white);
+  background: var(--color-bg2);
+  color: #28284f;
   line-height: 1.7;
+  
 }
 
+/* body, input, select, textarea {
+  color: #777;
+  font-family: "Source Sans Pro", sans-serif;
+  font-size: 16pt;
+  font-weight: 300;
+  line-height: 1.65em;
+  letter-spacing: -0.015em;
+} */
 
 /* ============ GENERAL STYLES ============ */
 
@@ -347,6 +357,32 @@ img {
   background-color: #ddd;
 }
 
+.team-box {
+  /* Padding */
+  padding-top: 1.75em;
+  padding-right: 1.75em;
+  padding-bottom: 0.1em;
+  padding-left: 1.75em;
+
+  /* Background color */
+  background-color: var(--color-white);
+
+  /* Border radius */
+  border-radius: 5px;
+
+  /* Margin */
+  margin-top: 1.5em;
+  margin-right: 3em;
+  margin-bottom: 1.5em;
+  margin-left: 0;
+
+  /* Width */
+  width: calc(25% - 1.5em);
+
+  /* Box shadow */
+  box-shadow: 0 0.5em 1em -0.125em rgba(10, 10, 10, 0.1), 
+              0 0 0 1px rgba(10, 10, 10, 0.02);
+}
 
 /* ============ COMPONENTS ============ */
 

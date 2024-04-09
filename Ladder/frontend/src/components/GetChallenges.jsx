@@ -40,7 +40,7 @@ const UserChallenges = () => {
       <h1 className='main__title'>{userInfo && userInfo.first_name}'s Challenges</h1>
       <div className="division-container">
         {userChallenges.map((challenge) => (
-          <div key={challenge.id} className="division-box" style={{ color: 'var(--color-white)' }}>
+          <div key={challenge.id} className="team-box">
             {/* <p>Match ID: {challenge.id}</p> */}
             <p>Division: {challenge.division}</p>
             <p>{challenge.team1_name} vs. {challenge.team2_name}</p>
