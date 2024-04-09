@@ -1,13 +1,26 @@
 from django.shortcuts import get_object_or_404
 from .models import MatchTable,CourtSchedule
+<<<<<<< HEAD
 from divisions.models import TeamInDivision, Division
+=======
+from django.shortcuts import get_object_or_404
+from rest_framework.decorators import api_view
+>>>>>>> MileStone1
 from .serializers import *
 from rest_framework.response import Response
 from rest_framework import viewsets, permissions, status
 from rest_framework.decorators import action
+<<<<<<< HEAD
 from collections import defaultdict
 import json
 from django.http import JsonResponse
+=======
+from .models import *
+from django.db.models import Q
+
+
+
+>>>>>>> MileStone1
 
 # Create your views here.
 class MatchTableView(viewsets.ViewSet):
@@ -33,6 +46,7 @@ class MatchTableView(viewsets.ViewSet):
         serializer = self.serializer_class(project)
         return Response(serializer.data)
     
+<<<<<<< HEAD
     #to get the match result with optional division
     @action(detail=False, methods=['GET'], url_path=r'match-results/(?P<team_name>[^/.]+)(?:/(?P<division_name>[^/.]+))?')
     def match_results(self, request, team_name=None,division_name=None):
@@ -79,6 +93,36 @@ class MatchTableView(viewsets.ViewSet):
         #     "team2Wins": 1,
         #     "status": "f"
         # }
+=======
+    @action(detail=False, methods=['GET'], url_path=r'user_challenges/(?P<user_id>\d+)')
+    def user_challenges(self, request, user_id=None):
+        # Get teams associated with the user
+        user_teams = Team.objects.filter(users=user_id)
+        
+        # Get matches where the user's teams are either team1 or team2
+        user_matches = MatchTable.objects.filter(
+            Q(team1Name__in=user_teams) | Q(team2Name__in=user_teams)
+        )
+        
+        # Serialize the matches
+        serializer = self.serializer_class(user_matches, many=True)
+        
+        # Return serialized matches as response
+        return Response(serializer.data)
+    
+    def put(self, request, pk):
+        try:
+            match_instance = MatchTable.objects.get(pk=pk)
+        except MatchTable.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        
+        # Update the match status
+        match_instance.status = 'i'  # Assuming 'i' represents "in progress"
+        match_instance.save()
+        
+        serializer = MatchTableSerializer(match_instance)
+        return Response(serializer.data)
+>>>>>>> MileStone1
 
 class CourtScheduleView(viewsets.ViewSet):
     queryset = CourtSchedule.objects.all()
@@ -102,3 +146,16 @@ class CourtScheduleView(viewsets.ViewSet):
         project = self.queryset.get(pk=pk)
         serializer = self.serializer_class(project)
         return Response(serializer.data)
+
+    @action(detail=False, methods=['GET'], url_path=r'match-court/(?P<match_id>\d+)')
+    def get_court_schedule(self, request, match_id=None):
+        try:
+            # Retrieve the CourtSchedule object associated with the match ID
+            court_schedule = CourtSchedule.objects.get(match_id=match_id)
+            # Serialize the CourtSchedule object
+            serializer = CourtScheduleSerializer(court_schedule)
+            # Return the serialized data as JSON response
+            return Response(serializer.data)
+        except CourtSchedule.DoesNotExist:
+            # Handle the case where no CourtSchedule is found for the given match ID
+            return Response({'error': 'Court schedule not found'}, status=404)

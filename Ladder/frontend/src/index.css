@@ -109,6 +109,11 @@ section>h2 {
   border: 1px solid var(--color-primary);
 }
 
+.btn-red {
+  background-color: var(--color-accent);
+  color: var(--color-white);
+}
+
 .btn-accent {
   background-color: var(--color-accent);
   color: var(--color-white);
