@@ -1,96 +1,61 @@
 import React, { useState, useEffect } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
 import axios from 'axios';
+import { useSelector, useDispatch } from 'react-redux'; 
+import { useNavigate} from 'react-router-dom'
+import { toast } from 'react-toastify'
 import { getUserInfo } from '../features/auth/authSlice'
 
 const CreateDivisionPage = () => {
   const dispatch = useDispatch()
+  const [name, setName] = useState('');
+  // Add other state variables if needed
+
   const { userInfo } = useSelector((state) => state.auth);
-  const [userData, setUserData] = useState({
-    first_name: '',
-    last_name: '',
-    email: '',
-    username: '', // Add username field to the state
-    profile_pic: null,
-  });
+  const navigate = useNavigate();
 
   useEffect(() => {
-    // Fetch existing user data when the component mounts
-    axios.get(`http://localhost:8000/user/${userInfo.id}/`)
-      .then((response) => {
-        const existingUserData = response.data;
-        setUserData(existingUserData);
-      })
-      .catch((error) => {
-        console.error('Error fetching user data:', error);
-      });
-
-      dispatch(getUserInfo())
-  }, [userInfo.id]);
-
-  const handleUsernameChange = (newUsername) => {
-    // Update only the username in the local state
-    setUserData((prevUserData) => ({
-      ...prevUserData,
-      username: newUsername,
-    }));
-  };
-
-  const handleProfilePicChange = (e) => {
-    // Update the profile_pic in the local state
-    setUserData((prevUserData) => ({
-      ...prevUserData,
-      profile_pic: e.target.files[0],
-    }));
-  };
+    // Fetch user information when the component mounts
+    dispatch(getUserInfo());
+  }, []); // Only run the effect once when the component mounts
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // Create FormData to include existing profile_pic
-    const formData = new FormData();
-    formData.append('first_name', userData.first_name);
-    formData.append('last_name', userData.last_name);
-    formData.append('email', userData.email);
-    formData.append('username', userData.username); // Add username
-    formData.append('profile_pic', userData.profile_pic);
-
-    // Send the updated user data back to the server
-    axios.put(`http://localhost:8000/user/${userInfo.id}/`, formData)
+    axios
+      .post(
+        'http://localhost:8000/division/',
+        { name, admin: userInfo.id }, // Use the logged-in user's ID as the admin
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      )
       .then((response) => {
-        console.log('Profile updated successfully:', response.data);
+        console.log('Division created successfully:', response.data);
+        toast.success("Division created successfully")
+        navigate("/dashboard")
       })
       .catch((error) => {
-        console.error('Error updating profile:', error);
-        // Handle errors as needed
+        console.error('Error creating division:', error);
+        toast.error("Error creating division")
+        // Handle errors
       });
   };
 
   return (
-    <div className="container auth__container">
-      <h1 className='main__title'>Edit Your Profile</h1>
-      <p>Hello {userInfo.first_name}, your ID is {userInfo.id}</p>
-
+    <div>
+      <h1 className="main__title">Create Division</h1>
       <form className="auth__form" onSubmit={handleSubmit}>
-        {/* Display existing user data in input fields */}
-        <div>
-          {/* Input for username */}
-          Username:
-          <input
-            type="text"
-            value={userData.username}
-            onChange={(e) => handleUsernameChange(e.target.value)}
-          />
-        </div>
-        <div>
-          {/* Input for profile_pic */}
-          Profile Picture:
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleProfilePicChange}
-          />
-        </div>
+        Division Name:
+        <input
+          type="text"
+          value={name}
+          placeholder="Division Name"
+          required
+          onChange={(e) => setName(e.target.value)}
+        />
+        {/* Add other input fields for division creation */}
         <button className="btn btn-primary" type="submit">
           Create Division
         </button>

@@ -1,66 +1,65 @@
-import React, { useState, useEffect, Component } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
 import { Link } from 'react-router-dom';
-//import './container.css' ;
-//import { ranktable } from 'components';
-import ranktable from '../components/ranktable'
-import CustomizedTables from '../components/ranktable';
+import { useSelector, useDispatch } from 'react-redux';
+import { getUserInfo } from '../features/auth/authSlice'; // Import the getUserInfo action
 
+import CheckUserCaptain from '../components/CheckUserCaptain' // Import the CheckUserCaptain component
+import CheckDivisionAdmin from '../components/CheckDivisionAdmin';
 
 const DivisionDetailsPage = () => {
-  const [divisionDetails, setDivisionDetails] = useState({});
+  const [divisionDetails, setDivisionDetails] = useState([]);
   const { name } = useParams();
+  const { userInfo } = useSelector((state) => state.auth);
+  const dispatch = useDispatch(); // Get the dispatch function
+
+
 
   useEffect(() => {
     const fetchDivisionDetails = async () => {
       try {
-        // Fetch division details
-        const divisionResponse = await axios.get(`http://localhost:8000/division/${name}/`);
-        console.log('Division Details API response:', divisionResponse.data);
-        setDivisionDetails(divisionResponse.data);
-
         // Fetch teams in the division along with their positions
         const teamsResponse = await axios.get(`http://localhost:8000/teamindivision/${name}/`);
         console.log('Teams in Division API response:', teamsResponse.data);
-        
-        // Create an array to store team details with names
-        const teamsWithNames = await Promise.all(teamsResponse.data.map(async team => {
-          const teamDetailsResponse = await axios.get(`http://localhost:8000/team/${team.team}/`);
-          const teamDetails = teamDetailsResponse.data;
-          return { ...team, team_name: teamDetails.name };
-        }));
-        
-        setDivisionDetails(prevState => ({
-          ...prevState,
-          teams: teamsWithNames
-        }));
+        setDivisionDetails(teamsResponse.data);
       } catch (error) {
         console.error('Error fetching division details:', error);
       }
     };
 
     fetchDivisionDetails();
+    dispatch(getUserInfo());
+
   }, [name]);
 
   return (
     <div>
-      <h1>{divisionDetails.name} Details</h1>
-      <p>Admin: {divisionDetails.admin_email}</p>
-      <h2>Teams in Division</h2>
-      <ul>
-        {divisionDetails.teams && divisionDetails.teams.map(team => (
-          <li key={team.team}>
-            Team: {team.team_name}, Position: {team.position}
-          </li>
-        ))}
-      </ul>
+      <h1>Teams in {name} Division</h1>
+      <div className="division-container">
+        <ul>
+          {divisionDetails.map((teamInfo, index) => (
+            <li key={index} className="division-box" style={{ color: 'var(--color-white)' }}>
+              <strong>Team Name:</strong> <br/> {teamInfo.team_name} <br/> <strong>Position:</strong> {teamInfo.position}
+            </li>
+          ))}
+        </ul>
+      </div>
+      {/* Use the CheckUserCaptain component */}
+      <CheckUserCaptain userId={userInfo.id} divisionName={name} />
       
-      <Link to="/joindivision">
+      <CheckDivisionAdmin divisionName={name} userId={userInfo.id} />
+
+      <Link to={`/joindivision/${name}`}>
         <button className="btn btn-primary">Join Division</button>
       </Link>
+<<<<<<< HEAD
   
           <CustomizedTables />
+=======
+
+
+>>>>>>> Adding-Ladder-Algorithm
     </div>
   );
 };
