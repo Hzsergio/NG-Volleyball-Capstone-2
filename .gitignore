@@ -52,8 +52,12 @@ Temporary Items
 
 venv/
 
+<<<<<<< HEAD
+__pycache__/
+=======
 __pycache__
 __pycache__/
 Ladder/backend/divisions/migrations/__pycache__/
 Ladder/backend/match/__pycache__/
 /Ladder/backend/divisions/migrations/__pycache__
+>>>>>>> 90687602bf09eed367300416cdeb753cdcac311b
