@@ -153,3 +153,5 @@ class CourtScheduleView(viewsets.ViewSet):
         except CourtSchedule.DoesNotExist:
             # Handle the case where no CourtSchedule is found for the given match ID
             return Response({'error': 'Court schedule not found'}, status=404)
+        
+    #@action(detail=False, methods=['GET'], url_path=r'')

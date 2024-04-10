@@ -1,4 +1,6 @@
-import * as React from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { useParams } from 'react-router-dom';
 import { styled } from '@mui/material/styles';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -28,18 +30,6 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   },
 }));
 
-function createData(name, rank, wins, loses, ratio) {
-  return { name, rank, wins, loses, ratio };
-}
-
-const rows = [
-  createData('Tigers', 1, 3, 0, 1.0),
-  createData('Icees', 2, 2, 1, .66),
-  createData('Falcons', 3, 2, 1, .66),
-  createData('Cupcakes', 4, 1, 2, .33),
-  createData('Vikings', 5, 0, 3, .00),
-];
-
 const CenteredTableContainer = styled(TableContainer)({
   display: 'flex',
   justifyContent: 'center',
@@ -48,6 +38,23 @@ const CenteredTableContainer = styled(TableContainer)({
 });
 
 export default function CustomizedTables() {
+  const { name } = useParams();
+  const [divisionDetails, setDivisionDetails] = useState([]);
+
+  useEffect(() => {
+    const fetchDivisionDetails = async () => {
+      try {
+        // Fetch teams in the division along with their positions
+        const teamsResponse = await axios.get(`http://localhost:8000/teamindivision/${name}/`);
+        console.log('Teams in Division API response:', teamsResponse.data);
+        setDivisionDetails(teamsResponse.data);
+      } catch (error) {
+        console.error('Error fetching division details:', error);
+      }
+    };
+    fetchDivisionDetails();
+  }, [name]); // Add divisionName as a dependency to useEffect
+
   return (
     <CenteredTableContainer component={Paper}>
       <Table aria-label="customized table">
@@ -61,15 +68,15 @@ export default function CustomizedTables() {
           </TableRow>
         </TableHead>
         <TableBody>
-          {rows.map((row) => (
-            <StyledTableRow key={row.name}>
+          {divisionDetails.map((team) => (
+            <StyledTableRow key={team.id}>
               <StyledTableCell component="th" scope="row">
-                {row.name}
+                {team.team_name}
               </StyledTableCell>
-              <StyledTableCell align="right">{row.rank}</StyledTableCell>
-              <StyledTableCell align="right">{row.wins}</StyledTableCell>
-              <StyledTableCell align="right">{row.loses}</StyledTableCell>
-              <StyledTableCell align="right">{row.ratio}</StyledTableCell>
+              <StyledTableCell align="right">{team.position}</StyledTableCell>
+              <StyledTableCell align="right">{team.wins}</StyledTableCell>
+              <StyledTableCell align="right">{team.losses}</StyledTableCell>
+              <StyledTableCell align="right">{team.ratio}</StyledTableCell>
             </StyledTableRow>
           ))}
         </TableBody>

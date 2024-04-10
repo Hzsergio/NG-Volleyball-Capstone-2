@@ -73,12 +73,8 @@ const DivisionDetailsPage = () => {
 
         </ul>
       </div>
-<<<<<<< HEAD
       <CustomizedTables/>
-
-=======
       
->>>>>>> MileStone1
       {/* Use the CheckUserCaptain component */}
       <CheckUserCaptain userId={userInfo.id} divisionName={name} />
       
@@ -87,8 +83,6 @@ const DivisionDetailsPage = () => {
       <Link to={`/joindivision/${name}`}>
         <button className="btn btn-primary">Join Division</button>
       </Link>
-<<<<<<< HEAD
-=======
 
       {/* Modal component */}
       {showModal && (
@@ -101,7 +95,6 @@ const DivisionDetailsPage = () => {
           </div>
         </div>
       )}
->>>>>>> MileStone1
     </div>
   );
 };
