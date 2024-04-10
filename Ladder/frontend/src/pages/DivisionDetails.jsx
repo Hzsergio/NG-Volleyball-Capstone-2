@@ -74,6 +74,10 @@ const DivisionDetailsPage = () => {
         </ul>
       </div>
       <CustomizedTables/>
+<<<<<<< HEAD
+=======
+
+>>>>>>> adaedc049eebf30c1fb3c6812c5f61251f2de057
       
       {/* Use the CheckUserCaptain component */}
       <CheckUserCaptain userId={userInfo.id} divisionName={name} />
