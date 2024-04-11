@@ -498,10 +498,10 @@ section > div:nth-child(2n) {
   margin-top: 125px; 
 }
 #semiFinals > div { 
-  margin-top: 230px; 
+  margin-top: 250px; 
 }
 #semiFinals > div:first-child { 
-  margin-top: 105px; 
+  margin-top: -15px; 
 }
 #conn3 div { 
   margin-top: 125px; 
