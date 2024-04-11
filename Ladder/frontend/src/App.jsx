@@ -22,6 +22,7 @@ import CreateDivisionPage from "./pages/CreateDivisionPage";
 import CreateChallenge from "./pages/CreateChallenge";
 import Calendar from "./pages/Calendar";
 import Inbox from "./pages/Inbox";
+import ManageMatches from "./pages/ManageMatches";
 
 function App() {
   return (
@@ -49,6 +50,9 @@ function App() {
           <Route path="/challenge/:name/:team1/:team2" element={<CreateChallenge />} />
           <Route path="/schedule" element={<Calendar />} />
           <Route path="/inbox" element={<Inbox/>} />
+          <Route path="/managematches/:divisionName" element={<ManageMatches/>} />
+
+
         </Routes>
       </Router>
       <ToastContainer />
