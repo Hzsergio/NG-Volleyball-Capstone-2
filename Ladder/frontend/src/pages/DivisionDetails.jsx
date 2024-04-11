@@ -16,12 +16,9 @@ const DivisionDetailsPage = () => {
   const { userInfo } = useSelector((state) => state.auth);
   const dispatch = useDispatch(); // Get the dispatch function
 
-<<<<<<< HEAD
-=======
   const openModal = () => setShowModal(true); // Function to open the modal
   const closeModal = () => setShowModal(false); // Function to close the modal
 
->>>>>>> Adding-Ladder-Algorithm
   useEffect(() => {
     const fetchDivisionDetails = async () => {
       try {
@@ -52,14 +49,6 @@ const DivisionDetailsPage = () => {
 
   return (
     <div>
-<<<<<<< HEAD
-      <h1>{name} Division</h1>
-
-      <CustomizedTables/>
-      
-      {/* Use the CheckUserCaptain component */}
-      <CheckUserCaptain userId={userInfo.id} divisionName={name} setIsCaptain={setIsCaptain}/>
-=======
       <h1>Teams in {name} Division</h1>
       <div className="division-container">
         <ul>
@@ -88,7 +77,6 @@ const DivisionDetailsPage = () => {
       
       {/* Use the CheckUserCaptain component */}
       <CheckUserCaptain userId={userInfo.id} divisionName={name} />
->>>>>>> Adding-Ladder-Algorithm
       
       <CheckDivisionAdmin divisionName={name} userId={userInfo.id} />
 
@@ -96,8 +84,6 @@ const DivisionDetailsPage = () => {
         <button className="btn btn-primary">Join Division</button>
       </Link>
 
-<<<<<<< HEAD
-=======
       {/* Modal component */}
       {showModal && (
         <div className="modal">
@@ -109,7 +95,6 @@ const DivisionDetailsPage = () => {
           </div>
         </div>
       )}
->>>>>>> Adding-Ladder-Algorithm
     </div>
   );
 };

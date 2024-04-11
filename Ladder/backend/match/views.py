@@ -1,8 +1,5 @@
-<<<<<<< HEAD
 from django.shortcuts import get_object_or_404
-=======
 from django.shortcuts import render
->>>>>>> Adding-Ladder-Algorithm
 from .models import MatchTable,CourtSchedule
 from divisions.models import TeamInDivision, Division
 from django.shortcuts import get_object_or_404
@@ -15,18 +12,11 @@ from collections import defaultdict
 import json
 from django.http import JsonResponse
 from .models import *
-<<<<<<< HEAD
 from django.db.models import Q
-
-
-
-
-=======
 from django.db.models import Q, F
 from django.http import JsonResponse
 
 
->>>>>>> Adding-Ladder-Algorithm
 # Create your views here.
 class MatchTableView(viewsets.ViewSet):
     queryset = MatchTable.objects.all()
@@ -38,10 +28,6 @@ class MatchTableView(viewsets.ViewSet):
         serializer = self.serializer_class(queryset, many=True)
         return Response(serializer.data)
     
-<<<<<<< HEAD
-=======
-
->>>>>>> Adding-Ladder-Algorithm
     def create(self, request):
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
@@ -55,10 +41,6 @@ class MatchTableView(viewsets.ViewSet):
         serializer = self.serializer_class(project)
         return Response(serializer.data)
     
-<<<<<<< HEAD
-
-    #to get the match result with optional division
-=======
     @action(detail=False, methods=['GET'], url_path=r'user_challenges/(?P<user_id>\d+)')
     def user_challenges(self, request, user_id=None):
         # Get teams associated with the user
@@ -89,7 +71,6 @@ class MatchTableView(viewsets.ViewSet):
         serializer = MatchTableSerializer(match_instance)
         return Response(serializer.data)
 
->>>>>>> Adding-Ladder-Algorithm
     @action(detail=False, methods=['GET'], url_path=r'match-results/(?P<team_name>[^/.]+)(?:/(?P<division_name>[^/.]+))?')
     def match_results(self, request, team_name=None,division_name=None):
         team = get_object_or_404(Team, name=team_name)
@@ -105,9 +86,6 @@ class MatchTableView(viewsets.ViewSet):
         serializer = self.serializer_class(match_result, many=True)#, exclude=['id', 'countDown'])
         return Response(serializer.data)
     
-<<<<<<< HEAD
-    #used for submiting result, void,finished. 
-=======
  
     @action(detail=False, methods=['GET'], url_path=r'table_view/(?P<team_name>[^/.]+)')
     def table_view(self, request, team_name=None):
@@ -138,7 +116,6 @@ class MatchTableView(viewsets.ViewSet):
 
         return Response(response_data)
     
->>>>>>> Adding-Ladder-Algorithm
     @action(detail=False, methods=['POST'], url_path=r'submit-results/(?P<match_id>[^/.]+)')
     def submit_results(self, request, match_id=None):
         try:
@@ -158,9 +135,6 @@ class MatchTableView(viewsets.ViewSet):
             if status:
                 match.status = status
 
-<<<<<<< HEAD
-            match.save() # Save the changes
-=======
             if match.team1Wins == match.team2Wins:
                  return JsonResponse({'message': 'No ties allowed.'}, status=400)
             match.save() # Save the changes
@@ -179,7 +153,6 @@ class MatchTableView(viewsets.ViewSet):
                 team1_in_division.save()
                 team2_in_division.save()
                 
->>>>>>> Adding-Ladder-Algorithm
             return JsonResponse({'message': 'Match results updated successfully.'})
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=400)
