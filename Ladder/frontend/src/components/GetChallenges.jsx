@@ -77,15 +77,11 @@ const UserChallenges = (isAdmin) => {
               </div>
             )}
 
-            {isAdmin && (
-              <>
+
                 <button className="btn btn-secondary">Accept</button>
                 <button className="btn btn-secondary">Reschedule</button>
-              </>
-            )}
-            {!isAdmin && (
+
               <button className="btn btn-primary">Report Score</button>
-            )}
           </div>
         ))}
       </div>

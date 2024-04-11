@@ -10,13 +10,11 @@ import CheckDivisionAdmin from "../components/CheckDivisionAdmin";
 const DivisionDetailsPage = () => {
   const [divisionDetails, setDivisionDetails] = useState([]);
   const [currentTeam, setCurrentTeam] = useState(null); // State to store current team
-  const [showModal, setShowModal] = useState(false); // State variable to control modal visibility
   const { name } = useParams();
   const { userInfo } = useSelector((state) => state.auth);
   const dispatch = useDispatch(); // Get the dispatch function
+  const [isCaptain, setIsCaptain] = useState(false);
 
-  const openModal = () => setShowModal(true); // Function to open the modal
-  const closeModal = () => setShowModal(false); // Function to close the modal
 
   useEffect(() => {
     const fetchDivisionDetails = async () => {
@@ -82,29 +80,13 @@ const DivisionDetailsPage = () => {
       </div>
 
       {/* Use the CheckUserCaptain component */}
-      <CheckUserCaptain userId={userInfo.id} divisionName={name} />
+      <CheckUserCaptain userId={userInfo.id} divisionName={name} isCaptain={setIsCaptain} />
 
       <CheckDivisionAdmin divisionName={name} userId={userInfo.id} />
 
       <Link to={`/joindivision/${name}`}>
         <button className="btn btn-primary">Join Division</button>
       </Link>
-
-      {/* Modal component */}
-      {showModal && (
-        <div className="modal">
-          <div className="modal-content">
-            <span className="close" onClick={closeModal}>
-              &times;
-            </span>
-            <h2>Challenge Modal</h2>
-            <p>This is the challenge modal content.</p>
-            <button className="btn btn-secondary" onClick={closeModal}>
-              Close
-            </button>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
