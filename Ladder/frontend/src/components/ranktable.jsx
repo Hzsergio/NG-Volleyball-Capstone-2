@@ -90,7 +90,7 @@ export default function CustomizedTables() {
             <StyledTableCell align="right">Wins</StyledTableCell>
             <StyledTableCell align="right">Loses</StyledTableCell>
             <StyledTableCell align="right">Ratio</StyledTableCell>
-            <StyledTableCell align="right">Challenge</StyledTableCell>
+            <StyledTableCell align="center">Challenge</StyledTableCell>
 
           </TableRow>
         </TableHead>
@@ -104,7 +104,7 @@ export default function CustomizedTables() {
               <StyledTableCell align="right">{team.wins}</StyledTableCell>
               <StyledTableCell align="right">{team.losses}</StyledTableCell>
               <StyledTableCell align="right">{team.ratio}</StyledTableCell>
-              <StyledTableCell align="right">
+              <StyledTableCell align="center">
                 {currentTeam !== team.team && (
                   <Link
                     to={`/challenge/${name}/${currentTeam}/${team.team}`}

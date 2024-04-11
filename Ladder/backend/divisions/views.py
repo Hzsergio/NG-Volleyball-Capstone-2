@@ -186,7 +186,7 @@ class TeamInDivisionView(viewsets.ViewSet):
     @action(detail=False, methods=['GET'], url_path=r'(?P<division_name>[^/.]+)')
     def list_by_division(self, request, division_name=None):
         division = get_object_or_404(Division, name=division_name)
-        team_in_division = self.queryset.filter(division=division)
+        team_in_division = self.queryset.filter(division=division).order_by("position")
         serializer = MatchTableSerializer(team_in_division, many=True)
         return Response(serializer.data)
     
@@ -241,4 +241,5 @@ class TeamInDivisionView(viewsets.ViewSet):
         #serializer = self.serializer_class(challengeables, many=True)
         #serializer = self.serializer_class(challengeables, many=True)
         #return Response(serializer.data)
+
     
