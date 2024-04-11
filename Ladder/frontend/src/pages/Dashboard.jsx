@@ -49,7 +49,7 @@ const Dashboard = () => {
         <button className="btn btn-primary">Create Team</button>
       </Link>
 
-      <GetChallenges/>
+      <GetChallenges isAdmin ={false}/>
       
     </div>
   );

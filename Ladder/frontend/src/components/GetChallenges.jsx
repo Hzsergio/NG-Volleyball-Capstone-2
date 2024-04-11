@@ -3,7 +3,7 @@ import axios from 'axios';
 import { useSelector, useDispatch } from 'react-redux';
 import { getUserInfo } from '../features/auth/authSlice';
 
-const UserChallenges = () => {
+const UserChallenges = (isAdmin) => {
   const [userChallenges, setUserChallenges] = useState([]);
   const { userInfo } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
@@ -52,10 +52,17 @@ const UserChallenges = () => {
                 <p>Start Time: <br/> {challenge.courtSchedules.startTime}</p>
                 <p>Match Detail: <br/> {challenge.courtSchedules.matchDetail}</p>
               </div>
+            )}            
+            
+            {isAdmin && (
+              <>
+                <button className="btn btn-secondary" >Accept</button>
+                <button className="btn btn-secondary" >Reschedule</button>
+              </>
             )}
-                  <button className="btn btn-secondary">Accept</button>
-                  <button className="btn btn-secondary">Reschedule</button>
-
+            {!isAdmin && (
+              <button className="btn btn-primary" >Report Score</button>
+            )}
           </div>
         ))}
       </div>
