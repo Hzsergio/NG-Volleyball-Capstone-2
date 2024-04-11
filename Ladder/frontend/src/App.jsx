@@ -21,6 +21,7 @@ import JoinDivisionPage from "./pages/JoinDivision";
 import CreateDivisionPage from "./pages/CreateDivisionPage";
 import CreateChallenge from "./pages/CreateChallenge";
 import Calendar from "./pages/Calendar";
+import ManageMatches from "./pages/ManageMatches";
 
 function App() {
   return (
@@ -47,6 +48,7 @@ function App() {
           <Route path="/joindivision/:divisionName" element={<JoinDivisionPage />} />
           <Route path="/challenge/:name/:team1/:team2" element={<CreateChallenge />} />
           <Route path="/schedule" element={<Calendar />} />
+          <Route path="managematches/:divisionName" element={<ManageMatches />} />
 
 
 

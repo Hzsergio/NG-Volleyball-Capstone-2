@@ -1,54 +1,60 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useSelector, useDispatch } from "react-redux";
-import { getUserInfo } from "../features/auth/authSlice";
+import { getUserInfo } from "../features/auth/authSlice"; // Import the getUserInfo action
+import { useParams } from "react-router-dom";
+import SubmitResult from "../components/SubmitResult";
 
-const UserChallenges = (isAdmin) => {
-  const [userChallenges, setUserChallenges] = useState([]);
+const ManageMatches = () => {
+  const [divisionMatches, setDivisionMatches] = useState([]);
   const { userInfo } = useSelector((state) => state.auth);
-  const dispatch = useDispatch();
+  const dispatch = useDispatch(); // Get the dispatch function
+  const { divisionName } = useParams();
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedMatch, setSelectedMatch] = useState(null); // State to hold the selected match
 
   useEffect(() => {
-    const fetchUserChallenges = async () => {
+    const fetchDivisionMatches = async () => {
       try {
         if (userInfo) {
           const response = await axios.get(
-            `http://localhost:8000/MatchTable/user_challenges/${userInfo.id}/`
+            `http://localhost:8000/MatchTable/division-matches/${divisionName}`
           );
-          console.log("User Challenges:", response.data);
           const challengesWithSchedule = await Promise.all(
             response.data.map(async (challenge) => {
-              // Fetch CourtSchedule details for each challenge
               const scheduleResponse = await axios.get(
                 `http://localhost:8000/CourtSchedule/match-court/${challenge.id}/`
               );
               return { ...challenge, courtSchedules: scheduleResponse.data };
             })
           );
-          setUserChallenges(challengesWithSchedule);
+
+          setDivisionMatches(challengesWithSchedule);
         }
       } catch (error) {
-        console.error("Error fetching user challenges:", error);
+        console.error("Error fetching division matches:", error);
       }
     };
 
-    fetchUserChallenges();
+    fetchDivisionMatches();
   }, [userInfo]);
 
   useEffect(() => {
     dispatch(getUserInfo());
   }, []);
 
+  const handleReportScoreClick = (match) => {
+    setSelectedMatch(match);
+    setModalOpen(true);
+  };
+
   return (
-    <div>
-      <h1 className="main__title">
-        {userInfo && userInfo.first_name}'s Challenges
-      </h1>
+    <div className="reportResultsBox">
+      <h1 className="main__title"> {divisionName} Matches </h1>
+
       <div className="division-container">
-        {userChallenges.map((challenge) => (
+        {divisionMatches.map((challenge) => (
           <div key={challenge.id} className="team-box">
-            {/* <p>Match ID: {challenge.id}</p> */}
-            <p>Division: {challenge.division}</p>
             <p>
               {challenge.team1_name} vs. {challenge.team2_name}
             </p>
@@ -62,7 +68,6 @@ const UserChallenges = (isAdmin) => {
                 ? "Finished"
                 : challenge.status}
             </p>
-            {/* Display schedule details if available */}
             {challenge.courtSchedules && (
               <div>
                 <p>
@@ -76,17 +81,20 @@ const UserChallenges = (isAdmin) => {
                 </p>
               </div>
             )}
-
-
-                <button className="btn btn-secondary">Accept</button>
-                <button className="btn btn-secondary">Reschedule</button>
-
-              <button className="btn btn-primary">Report Score</button>
+            {challenge.status === "i" && (
+              <button
+                className="btn btn-primary"
+                onClick={() => handleReportScoreClick(challenge)} // Pass the challenge as an argument
+              >
+                Report Score
+              </button>
+            )}
           </div>
         ))}
       </div>
+      {modalOpen && <SubmitResult setOpenModal={setModalOpen} selectedMatch={selectedMatch} />} 
     </div>
   );
 };
 
-export default UserChallenges;
+export default ManageMatches;

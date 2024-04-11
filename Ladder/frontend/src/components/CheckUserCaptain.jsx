@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
-const CheckUserCaptain = ({ userId, divisionName }) => {
-  const [isCaptain, setIsCaptain] = useState(false);
+const CheckUserCaptain = ({ userId, divisionName, setIsCaptain}) => {
+  // const [isCaptain, setIsCaptain] = useState(false);
 
   useEffect(() => {
     const checkUserIsCaptain = async () => {
@@ -22,12 +22,12 @@ const CheckUserCaptain = ({ userId, divisionName }) => {
 
   return (
     <div>
-      {isCaptain ? (
+      {/* {isCaptain ? (
         
-        <div> <button className='btn btn-primary'> You are a captain of a team in this division</button> </div>
+        <div> <button className='btn btn-red'> Captain</button> </div>
       ) : (
         <p>You are not a captain of any team in this division.</p>
-      )}
+      )} */}
     </div>
   );
 };
