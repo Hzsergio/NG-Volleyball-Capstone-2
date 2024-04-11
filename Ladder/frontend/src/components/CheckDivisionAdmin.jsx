@@ -1,20 +1,23 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { toast } from 'react-toastify'
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { toast } from "react-toastify";
+import { Link } from "react-router-dom";
 
 
 function CheckDivisionAdmin({ divisionName, userId }) {
   const [isAdmin, setIsAdmin] = useState(null);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
   useEffect(() => {
     const fetchAdminStatus = async () => {
       try {
-        const response = await axios.get(`http://localhost:8000/teamindivision/check-admin/${divisionName}/${userId}/`);
+        const response = await axios.get(
+          `http://localhost:8000/teamindivision/check-admin/${divisionName}/${userId}/`
+        );
         setIsAdmin(response.data.is_admin);
-        setError('');
+        setError("");
       } catch (error) {
-        setError('Error checking admin status');
+        setError("Error checking admin status");
         setIsAdmin(null);
       }
     };
@@ -24,14 +27,15 @@ function CheckDivisionAdmin({ divisionName, userId }) {
 
   const handleAssignPositions = async () => {
     try {
-      await axios.post(`http://localhost:8000/teamindivision/assign-positions/${divisionName}/`);
-      setError('');
+      await axios.post(
+        `http://localhost:8000/teamindivision/assign-positions/${divisionName}/`
+      );
+      setError("");
       // Optionally, you can perform additional actions after successful assignment
-      console.log('Positions assigned successfully.');
-      toast.success("Started Division")
-
+      console.log("Positions assigned successfully.");
+      toast.success("Started Division");
     } catch (error) {
-      setError('Error assigning positions');
+      setError("Error assigning positions");
     }
   };
 
@@ -39,14 +43,22 @@ function CheckDivisionAdmin({ divisionName, userId }) {
     <div>
       {isAdmin !== null && (
         <div>
-          <p>{isAdmin ? 'User is the admin' : 'User is not the admin'}</p>
+          <p>{isAdmin ? "User is the admin" : "User is not the admin"}</p>
           {isAdmin && (
-            <button className='btn btn-primary' onClick={handleAssignPositions}>Assign Positions</button>
+            <button className="btn btn-primary" onClick={handleAssignPositions}>
+              Assign Positions
+            </button>
+          )}
+
+          {isAdmin && (
+            <Link to={`/managematches/${divisionName}`}>
+              <button className="btn btn-primary">Manage Matches</button>
+            </Link>
           )}
         </div>
       )}
       {error && <p>{error}</p>}
-      <br/>
+      <br />
     </div>
   );
 }

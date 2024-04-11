@@ -62,9 +62,9 @@ const CreateChallenge = () => {
   return (
     <div>
       <h1 className="main__title">Create Challenge</h1>
-      <div>
-        <h1>Challenge {teamDetails.name}? <br/> Details</h1>
-        <div>
+      <div >
+        <h1>Challenge {teamDetails.name}?</h1>
+        <div className="team-box">
           <h2>Name: {teamDetails.name}</h2>
           <p>Captain: {teamDetails.captain_username}</p>
           <p>Members: <br /></p>
@@ -77,7 +77,7 @@ const CreateChallenge = () => {
 
         <button className='btn btn-primary' onClick={handleCreateChallenge}>Challenge</button>
         <br/>
-        <button className='btn btn-red' onClick={handleCreateChallenge}>Cancel</button>
+        
 
 
         {challengeCreated && <Calendar matchID={matchID} />}
