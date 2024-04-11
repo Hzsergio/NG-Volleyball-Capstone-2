@@ -41,7 +41,7 @@ class MatchTableSerializer(serializers.ModelSerializer):
     def get_losses(self, obj):
         wins=self.get_wins(obj)
         totalGames = self.get_total_games(obj)
-        return wins - totalGames
+        return totalGames - wins
     
     def get_total_games(self, obj):
         team = obj.team
