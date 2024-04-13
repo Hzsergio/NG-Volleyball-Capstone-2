@@ -16,7 +16,7 @@ class MatchTableSerializer(serializers.ModelSerializer):
         fields = ('id','team1Name','team2Name', 'division', 'ref','countDown','team1Wins','team2Wins','status','team1_name', 'team2_name')
 
 class CourtScheduleSerializer(serializers.ModelSerializer):
-    startTime = serializers.DateTimeField(format='%H:%M %m-%d-%Y')  # Format the startTime field
+    startTime = serializers.DateTimeField(format='%I:%M %m-%d-%Y')  # Format the startTime field
 
     class Meta:
         model = CourtSchedule
