@@ -49,61 +49,55 @@ const ManageMatches = () => {
     setSelectedMatch(match);
     setModalOpen(true);
   };
-
+      <CheckDivisionAdmin divisionName={divisionName} userId={userInfo.id} />
   return (
     <div >
       <CheckDivisionAdmin divisionName={divisionName} userId={userInfo.id} />
-
+      <div className="reportResultsBox">
       <h1 className="main__title"> {divisionName} Matches </h1>
 
-
-      <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="division-container">
         {divisionMatches.map((challenge) => (
-          <div key={challenge.id} className="bg-white shadow overflow-hidden sm:rounded-lg">
-            <div className="px-4 py-5 sm:px-6">
-              <h3 className="text-lg leading-6 font-medium text-gray-900">Match ID: {challenge.id}</h3>
-            </div>
-            <div className="border-t border-gray-200 px-4 py-5 sm:p-0">
-              <dl className="sm:divide-y sm:divide-gray-200">
-                <div className="flex flex-col sm:flex-row sm:divide-x sm:divide-gray-200">
-                  <div className="px-4 py-2 sm:w-1/3">
-                    <dt className="text-sm font-medium text-gray-500">Teams</dt>
-                    <dd className="mt-1 text-sm text-gray-900">{challenge.team1_name} vs. {challenge.team2_name}</dd>
-                  </div>
-                  <div className="px-4 py-2 sm:w-1/3">
-                    <dt className="text-sm font-medium text-gray-500">Status</dt>
-                    <dd className="mt-1 text-sm text-gray-900">{challenge.status === "s" ? "Scheduled" : challenge.status === "i" ? "In Progress" : challenge.status === "f" ? "Finished" : challenge.status}</dd>
-                  </div>
-                  <div className="px-4 py-2 sm:w-1/3">
-                    <dt className="text-sm font-medium text-gray-500">Location</dt>
-                    <dd className="mt-1 text-sm text-gray-900">{challenge.courtSchedules && challenge.courtSchedules.location}</dd>
-                  </div>
-                </div>
-                {challenge.courtSchedules && (
-                  <div className="flex flex-col sm:flex-row sm:divide-x sm:divide-gray-200">
-                    <div className="px-4 py-2 sm:w-1/3">
-                      <dt className="text-sm font-medium text-gray-500">Start Time</dt>
-                      <dd className="mt-1 text-sm text-gray-900">{challenge.courtSchedules.startTime}</dd>
-                    </div>
-                    <div className="px-4 py-2 sm:w-1/3">
-                      <dt className="text-sm font-medium text-gray-500">Match Detail</dt>
-                      <dd className="mt-1 text-sm text-gray-900">{challenge.courtSchedules.matchDetail}</dd>
-                    </div>
-                  </div>
-                )}
-                <div className="px-4 py-2 sm:w-full">
-                  <dt className="text-sm font-medium text-gray-500">Actions</dt>
-                  {challenge.status === "i" && (
-                    <button className="btn btn-primary" onClick={() => handleReportScoreClick(challenge)}>Report Score</button>
-                  )}
-                </div>
-              </dl>
-            </div>
+          <div key={challenge.id} className="team-box">
+            <p>
+              {challenge.team1_name} vs. {challenge.team2_name}
+            </p>
+            <p>
+              Status:{" "}
+              {challenge.status === "s"
+                ? "Scheduled"
+                : challenge.status === "i"
+                ? "In Progress"
+                :challenge.status === "f"
+                ? "Finished"
+                : challenge.status}
+            </p>
+            {challenge.courtSchedules && (
+              <div>
+                <p>
+                  Location: <br /> {challenge.courtSchedules.location}
+                </p>
+                <p>
+                  Start Time: <br /> {challenge.courtSchedules.startTime}
+                </p>
+                <p>
+                  Match Detail: <br /> {challenge.courtSchedules.matchDetail}
+                </p>
+              </div>
+            )}
+            {challenge.status === "i" && (
+              <button
+                className="btn btn-primary"
+                onClick={() => handleReportScoreClick(challenge)} // Pass the challenge as an argument
+              >
+                Report Score
+              </button>
+            )}
           </div>
         ))}
       </div>
-      {modalOpen && <SubmitResult setOpenModal={setModalOpen} selectedMatch={selectedMatch} />}
-
+      {modalOpen && <SubmitResult setOpenModal={setModalOpen} selectedMatch={selectedMatch} />} 
+      </div>
     </div>
   );
 };
