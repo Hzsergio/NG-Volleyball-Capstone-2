@@ -46,6 +46,8 @@ const DivisionDetailsPage = () => {
 
   return (
     <div>
+            <CheckDivisionAdmin divisionName={name} userId={userInfo.id} />
+
       <h1>{name} Division</h1>
 
       <CustomizedTables/>
@@ -53,7 +55,6 @@ const DivisionDetailsPage = () => {
       {/* Use the CheckUserCaptain component */}
       <CheckUserCaptain userId={userInfo.id} divisionName={name} setIsCaptain={setIsCaptain}/>
       
-      <CheckDivisionAdmin divisionName={name} userId={userInfo.id} />
 
       <Link to={`/joindivision/${name}`}>
         <button className="btn btn-primary">Join Division</button>
