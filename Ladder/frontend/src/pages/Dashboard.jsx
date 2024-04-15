@@ -24,6 +24,7 @@ const Dashboard = () => {
         // Handle errors
       }
     };
+    console.log(userInfo)
 
     fetchUserTeams();
   }, [userInfo]); // Only run the effect when userInfo changes

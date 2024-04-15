@@ -26,7 +26,7 @@ const DivisionsPage = () => {
 
 
       <div style={{ transform: 'scale(0.9)' }}>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
           {divisions.map((division, index) => (
             <div key={division.name} className={`max-w-sm rounded overflow-hidden shadow-lg mb-4 ${index % 4 === 0 ? 'pl-4' : ''}`}>
               <Link to={`/division/${division.name}`} >

@@ -1,12 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify'
-import { useSelector, useDispatch } from "react-redux";
-import { getUserInfo } from "../features/auth/authSlice";
 
-function SubmitResults({ selectedMatch }) {
-  const { userInfo } = useSelector((state) => state.auth);
-  const dispatch = useDispatch();
+
+function SubmitResults({ setOpenModal, selectedMatch }) {
   const [teamScores, setTeamScores] = useState({
     team1: '',
     team2: ''
@@ -14,17 +11,12 @@ function SubmitResults({ selectedMatch }) {
 
   // Function to handle score input changes
   const handleScoreChange = (team, score) => {
-
     setTeamScores(prevState => ({
       ...prevState,
       [team]: score
     }));
   };
 
-  useEffect(() => {
-    dispatch(getUserInfo());
-    console.log("Selected match: ", selectedMatch)
-  }, []);
   // Function to submit the results
   const handleSubmitResults = async () => {
     try {
@@ -34,15 +26,8 @@ function SubmitResults({ selectedMatch }) {
         return;
       }
 
-      // Make the POST request to submit the results
-      const response = await axios.post(`http://localhost:8000/MatchTable/submit-results/${selectedMatch.id}/`, {
-        team1Wins: parseInt(teamScores.team1),
-        team2Wins: parseInt(teamScores.team2),
-        status: 'f'
-      });
-
       // Log the response
-      console.log('Results submitted:', response.data);
+      console.log('Results submitted:', teamScores);
       toast.success("Result Submitted")
 
       // Close the modal
@@ -56,7 +41,7 @@ function SubmitResults({ selectedMatch }) {
 
   return (
     <div >
-      <button className="btn btn-primary" onClick={() => document.getElementById('my_modal_1').showModal()}>Report Score</button>
+      <button className="btn" onClick={() => document.getElementById('my_modal_1').showModal()}>open modal</button>
 
       <dialog id="my_modal_1" className="modal">
         <div className="modal-box">
@@ -98,3 +83,4 @@ function SubmitResults({ selectedMatch }) {
 }
 
 export default SubmitResults;
+
