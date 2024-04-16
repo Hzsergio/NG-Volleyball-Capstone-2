@@ -1,0 +1,4 @@
+Set-ExecutionPolicy Unrestricted -Scope Process
+ .\venv\Scripts\activate    #windows
+ 
+ Ladder\venv\Scripts\activate #mac
