@@ -67,11 +67,21 @@ export default function Calendar({ matchID }) {
     setOpenDialog(true);
   };
 
+  const deleteChallenge = async () => {
+    try {
+    const deleteResponse = await axios.delete(`http://localhost:8000/MatchTable/${matchID}`);
+    console.log('Delete response:', deleteResponse.data);
+    navigate(`/division/${matchID}`)
+    } catch (error){
+      console.error('Error deleting details:', error);
+
+    }
+  };
   return (
-    <LocalizationProvider dateAdapter={AdapterDayjs} style={{ color: 'var(--color-white)' }}>
-      <Stack spacing={3} style={{ color: 'var(--color-white)' }}>
+    <LocalizationProvider dateAdapter={AdapterDayjs} >
+      <Stack spacing={3} >
         <Typography variant="h4" gutterBottom>
-          Challenge Schedule
+          Schedule
         </Typography>
         <Stack direction="row" spacing={1} alignItems="center">
           <DateTimePicker
@@ -91,7 +101,8 @@ export default function Calendar({ matchID }) {
             onChange={handleMatchDetailChange}
           />
         </Stack>
-        <Button variant="outlined" onClick={handleOpenDialog} sx={{ mt: 2, color: 'white' }}>Send Challenge Request</Button>
+        <Button variant="outlined" onClick={handleOpenDialog} >Send Challenge Request</Button>
+        <button className='btn btn-red' onClick={deleteChallenge}>Cancel</button>
       </Stack>
       <Dialog
         open={openDialog}

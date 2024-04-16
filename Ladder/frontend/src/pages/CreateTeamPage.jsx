@@ -17,6 +17,8 @@ const CreateTeamPage = () => {
   useEffect(() => {
     // Fetch user information when the component mounts
     dispatch(getUserInfo());
+    console.log(userInfo)
+
   }, []); // Only run the effect once when the component mounts
 
   const handleSubmit = (e) => {

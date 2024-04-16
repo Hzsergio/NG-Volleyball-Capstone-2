@@ -7,7 +7,7 @@ from rest_framework.decorators import api_view
 from django.db.models import F,Q
 from .models import Division,TeamInDivision, Team, User
 from match.models import MatchTable
-from .serializers import DivisionSerializer,TeamInDivisionSerializer
+from .serializers import DivisionSerializer,TeamInDivisionSerializer, MatchTableSerializer
 from rest_framework.decorators import action
 from collections import defaultdict
 
@@ -186,8 +186,8 @@ class TeamInDivisionView(viewsets.ViewSet):
     @action(detail=False, methods=['GET'], url_path=r'(?P<division_name>[^/.]+)')
     def list_by_division(self, request, division_name=None):
         division = get_object_or_404(Division, name=division_name)
-        team_in_division = self.queryset.filter(division=division)
-        serializer = self.serializer_class(team_in_division, many=True)
+        team_in_division = self.queryset.filter(division=division).order_by("position")
+        serializer = MatchTableSerializer(team_in_division, many=True)
         return Response(serializer.data)
     
     @action(detail=False, methods=['POST'], url_path='assign-positions/(?P<division_name>[^/.]+)')
@@ -241,4 +241,5 @@ class TeamInDivisionView(viewsets.ViewSet):
         #serializer = self.serializer_class(challengeables, many=True)
         #serializer = self.serializer_class(challengeables, many=True)
         #return Response(serializer.data)
+
     

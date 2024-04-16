@@ -1,5 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap');
-
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 * {
   margin: 0;
@@ -10,9 +12,10 @@
   list-style: none;
   text-decoration: none;
 }
-
+ 
 :root {
-  --color-bg: #1f1f38;
+  --color-bg: #1f1f38; 
+  --color-bg2: #f4f5f7;
   --color-bg-variant: #28284f;
   --color-primary: #007bff;
   /* Blue */
@@ -39,11 +42,26 @@
 
 body {
   font-family: 'Poppins', sans-serif;
-  background: var(--color-bg);
-  color: var(--color-white);
+  background: var(--color-bg2);
+  color: #28284f;
   line-height: 1.7;
+  
 }
-
+.nameofpage {
+  font-size: 24px;
+  line-height: 28px;
+  color: var(--hub-color-black);
+  font-weight: 500;
+  margin: 16px 10px;
+}
+/* body, input, select, textarea {
+  color: #777;
+  font-family: "Source Sans Pro", sans-serif;
+  font-size: 16pt;
+  font-weight: 300;
+  line-height: 1.65em;
+  letter-spacing: -0.015em;
+} */
 
 /* ============ GENERAL STYLES ============ */
 
@@ -347,6 +365,32 @@ img {
   background-color: #ddd;
 }
 
+.team-box {
+  /* Padding */
+  padding-top: 1.75em;
+  padding-right: 1.75em;
+  padding-bottom: 0.1em;
+  padding-left: 1.75em;
+
+  /* Background color */
+  background-color: var(--color-white);
+
+  /* Border radius */
+  border-radius: 5px;
+
+  /* Margin */
+  margin-top: 1.5em;
+  margin-right: 3em;
+  margin-bottom: 1.5em;
+  margin-left: 0;
+
+  /* Width */
+  width: calc(25% - 1.5em);
+
+  /* Box shadow */
+  box-shadow: 0 0.5em 1em -0.125em rgba(10, 10, 10, 0.1), 
+              0 0 0 1px rgba(10, 10, 10, 0.02);
+}
 
 /* ============ COMPONENTS ============ */
 
@@ -479,3 +523,158 @@ section > div:nth-child(2n) {
 #final > div { 
   margin-top: 250px; 
 }
+
+ /* modal test */
+.modalBackground {
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(200, 200, 200);
+  position: fixed;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9000;
+  box-sizing: border-box;
+
+}
+
+.modalContainer {
+  width: 500px;
+  height: 500px;
+  border-radius: 12px;
+  background-color: white;
+  box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+  display: flex;
+  flex-direction: column;
+  padding: 25px;
+  z-index: 9000;
+
+}
+
+.modalContainer .title {
+  display: inline-block;
+  text-align: center;
+  margin-top: 10px;
+}
+
+.titleCloseBtn {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.titleCloseBtn button {
+  background-color: transparent;
+  border: none;
+  font-size: 25px;
+  cursor: pointer;
+}
+
+.modalContainer .body {
+  flex: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.7rem;
+  text-align: center;
+}
+
+.modalContainer .footer {
+  flex: 20%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modalContainer .footer button {
+  width: 150px;
+  height: 45px;
+  margin: 10px;
+  border: none;
+  background-color: cornflowerblue;
+  color: white;
+  border-radius: 8px;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+#cancelBtn {
+  background-color: crimson;
+}
+
+.reportResultsBox {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  font-family: "Nunito", sans-serif;
+}
+
+
+/* Table */
+
+.table-wrapper {
+  -webkit-overflow-scrolling: touch;
+  overflow-x: auto;
+}
+
+table {
+  margin: 0 0 2em 0;
+  width: 100%;
+}
+
+  table tbody tr {
+    border: solid 1px #e5e5e5;
+    border-left: 0;
+    border-right: 0;
+  }
+
+    table tbody tr:nth-child(2n + 1) {
+      background-color: #f8f8f8;
+    }
+
+  table td {
+    padding: 0.75em 0.75em;
+  }
+
+  table th {
+    color: #646464;
+    font-size: 0.9em;
+    font-weight: 300;
+    padding: 0 0.75em 0.75em 0.75em;
+    text-align: left;
+  }
+
+  table thead {
+    border-bottom: solid 2px #e5e5e5;
+  }
+
+  table tfoot {
+    border-top: solid 2px #e5e5e5;
+  }
+
+  table.alt {
+    border-collapse: separate;
+  }
+
+    table.alt tbody tr td {
+      border: solid 1px #e5e5e5;
+      border-left-width: 0;
+      border-top-width: 0;
+    }
+
+      table.alt tbody tr td:first-child {
+        border-left-width: 1px;
+      }
+
+    table.alt tbody tr:first-child td {
+      border-top-width: 1px;
+    }
+
+    table.alt thead {
+      border-bottom: 0;
+    }
+
+    table.alt tfoot {
+      border-top: 0;
+    }

@@ -1,4 +1,4 @@
-from django.shortcuts import get_object_or_404
+from django.shortcuts import render
 from .models import MatchTable,CourtSchedule
 from divisions.models import TeamInDivision, Division
 from django.shortcuts import get_object_or_404
@@ -11,9 +11,8 @@ from collections import defaultdict
 import json
 from django.http import JsonResponse
 from .models import *
-from django.db.models import Q
-
-
+from django.db.models import Q, F
+from django.http import JsonResponse
 
 
 # Create your views here.
@@ -27,6 +26,7 @@ class MatchTableView(viewsets.ViewSet):
         serializer = self.serializer_class(queryset, many=True)
         return Response(serializer.data)
     
+
     def create(self, request):
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
@@ -40,8 +40,36 @@ class MatchTableView(viewsets.ViewSet):
         serializer = self.serializer_class(project)
         return Response(serializer.data)
     
+    @action(detail=False, methods=['GET'], url_path=r'user_challenges/(?P<user_id>\d+)')
+    def user_challenges(self, request, user_id=None):
+        # Get teams associated with the user
+        user_teams = Team.objects.filter(users=user_id)
+        
+        # Get matches where the user's teams are either team1 or team2
+        user_matches = MatchTable.objects.filter(
+            Q(team1Name__in=user_teams) | Q(team2Name__in=user_teams)
+        )
+        
+        # Serialize the matches
+        serializer = self.serializer_class(user_matches, many=True)
+        
+        # Return serialized matches as response
+        return Response(serializer.data)
+    
 
-    #to get the match result with optional division
+    def put(self, request, pk):
+        try:
+            match_instance = MatchTable.objects.get(pk=pk)
+        except MatchTable.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        
+        # Update the match status
+        match_instance.status = 'i'  # 'i' represents "in progress"
+        match_instance.save()
+        
+        serializer = MatchTableSerializer(match_instance)
+        return Response(serializer.data)
+
     @action(detail=False, methods=['GET'], url_path=r'match-results/(?P<team_name>[^/.]+)(?:/(?P<division_name>[^/.]+))?')
     def match_results(self, request, team_name=None,division_name=None):
         team = get_object_or_404(Team, name=team_name)
@@ -57,7 +85,36 @@ class MatchTableView(viewsets.ViewSet):
         serializer = self.serializer_class(match_result, many=True)#, exclude=['id', 'countDown'])
         return Response(serializer.data)
     
-    #used for submiting result, void,finished. 
+ 
+    @action(detail=False, methods=['GET'], url_path=r'table_view/(?P<team_name>[^/.]+)')
+    def table_view(self, request, team_name=None):
+        team = get_object_or_404(Team, name=team_name)
+        
+        #get total matches
+        matches = MatchTable.objects.filter(Q(team1Name=team) | Q(team2Name=team), status=MatchTable.Status.FINISHED)
+        total_games = matches.count()
+
+        #to get wins and loses
+        total_wins = matches.filter(team1Name=team, team1Wins__gt=F('team2Wins')).count() + \
+                     matches.filter(team2Name=team, team2Wins__gt=F('team1Wins')).count()
+        total_losses = total_games - total_wins
+
+        # Calculate win rate
+        if total_games > 0:
+            win_rate = total_wins / total_games
+        else: 
+            win_rate=0
+
+        # Construct the response data
+        response_data = {
+            'team_name': team_name,
+            'total_wins': total_wins,
+            'total_losses': total_losses,
+            'win_rate': win_rate
+        }
+
+        return Response(response_data)
+    
     @action(detail=False, methods=['POST'], url_path=r'submit-results/(?P<match_id>[^/.]+)')
     def submit_results(self, request, match_id=None):
         try:
@@ -77,7 +134,24 @@ class MatchTableView(viewsets.ViewSet):
             if status:
                 match.status = status
 
+            if match.team1Wins == match.team2Wins:
+                 return JsonResponse({'message': 'No ties allowed.'}, status=400)
             match.save() # Save the changes
+
+            #changing their position if challenger won
+            if match.status == MatchTable.Status.FINISHED and match.team1Wins > match.team2Wins:
+                team1_in_division = get_object_or_404(TeamInDivision, division=match.division, team=match.team1Name)
+                team2_in_division = get_object_or_404(TeamInDivision, division=match.division, team=match.team2Name)
+
+                #swapping the positions
+                team1_position = team1_in_division.position
+                team2_position = team2_in_division.position
+                team1_in_division.position = team2_position
+                team2_in_division.position = team1_position
+                #saving the data
+                team1_in_division.save()
+                team2_in_division.save()
+                
             return JsonResponse({'message': 'Match results updated successfully.'})
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=400)
@@ -101,6 +175,19 @@ class MatchTableView(viewsets.ViewSet):
         # Serialize the matches
         serializer = self.serializer_class(user_matches, many=True)
         
+        # Return serialized matches as response
+        return Response(serializer.data)
+    
+    @action(detail=False, methods=['GET'], url_path=r'division-matches/(?P<divisionName>[^/.]+)')
+    def division_matches(self, request, divisionName=None):
+        # Get teams associated with the division
+        division_matches = MatchTable.objects.filter(division=divisionName)
+        
+
+        # Serialize the matches
+        serializer = self.serializer_class(division_matches, many=True)
+        
+
         # Return serialized matches as response
         return Response(serializer.data)
     
@@ -153,3 +240,5 @@ class CourtScheduleView(viewsets.ViewSet):
         except CourtSchedule.DoesNotExist:
             # Handle the case where no CourtSchedule is found for the given match ID
             return Response({'error': 'Court schedule not found'}, status=404)
+        
+    #@action(detail=False, methods=['GET'], url_path=r'')
