@@ -11,17 +11,11 @@ import CustomizedTables from '../components/ranktable';
 const DivisionDetailsPage = () => {
   const [divisionDetails, setDivisionDetails] = useState([]);
   const [currentTeam, setCurrentTeam] = useState(null); // State to store current team
-  const [showModal, setShowModal] = useState(false); // State variable to control modal visibility
   const { name } = useParams();
   const { userInfo } = useSelector((state) => state.auth);
   const dispatch = useDispatch(); // Get the dispatch function
+  const [isCaptain, setIsCaptain] = useState(false);
 
-<<<<<<< HEAD
-=======
-  const openModal = () => setShowModal(true); // Function to open the modal
-  const closeModal = () => setShowModal(false); // Function to close the modal
-
->>>>>>> Adding-Ladder-Algorithm
   useEffect(() => {
     const fetchDivisionDetails = async () => {
       try {
@@ -52,43 +46,12 @@ const DivisionDetailsPage = () => {
 
   return (
     <div>
-<<<<<<< HEAD
       <h1>{name} Division</h1>
 
       <CustomizedTables/>
       
       {/* Use the CheckUserCaptain component */}
       <CheckUserCaptain userId={userInfo.id} divisionName={name} setIsCaptain={setIsCaptain}/>
-=======
-      <h1>Teams in {name} Division</h1>
-      <div className="division-container">
-        <ul>
-        {divisionDetails.map((teamInfo, index) => (
-  <li key={index} className="division-box" style={{ color: 'var(--color-white)' }}>
-    <strong>Team Name:</strong> <br/> {teamInfo.team_name} <br/> <strong>Position:</strong> {teamInfo.position}
-    <br/>
-    {/* Check if the current team ID is not equal to the ID of the team being rendered */}
-    {currentTeam !== teamInfo.team&& (
-      <Link
-      to={`/challenge/${name}/${currentTeam}/${teamInfo.team}`}
-      onClick={() => {
-        console.log("Team 1:", currentTeam);
-        console.log("Team 2:", teamInfo.team);
-      }}
-    >
-      <button className="btn btn-secondary">Challenge</button>
-    </Link>
-    )}
-  </li>
-))}
-
-        </ul>
-      </div>
-      <CustomizedTables/>
-      
-      {/* Use the CheckUserCaptain component */}
-      <CheckUserCaptain userId={userInfo.id} divisionName={name} />
->>>>>>> Adding-Ladder-Algorithm
       
       <CheckDivisionAdmin divisionName={name} userId={userInfo.id} />
 
@@ -96,20 +59,6 @@ const DivisionDetailsPage = () => {
         <button className="btn btn-primary">Join Division</button>
       </Link>
 
-<<<<<<< HEAD
-=======
-      {/* Modal component */}
-      {showModal && (
-        <div className="modal">
-          <div className="modal-content">
-            <span className="close" onClick={closeModal}>&times;</span>
-            <h2>Challenge Modal</h2>
-            <p>This is the challenge modal content.</p>
-            <button className="btn btn-secondary" onClick={closeModal}>Close</button>
-          </div>
-        </div>
-      )}
->>>>>>> Adding-Ladder-Algorithm
     </div>
   );
 };

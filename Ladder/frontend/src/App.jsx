@@ -22,10 +22,7 @@ import CreateDivisionPage from "./pages/CreateDivisionPage";
 import CreateChallenge from "./pages/CreateChallenge";
 import Calendar from "./pages/Calendar";
 import Inbox from "./pages/Inbox";
-<<<<<<< HEAD
 import ManageMatches from "./pages/ManageMatches";
-=======
->>>>>>> Adding-Ladder-Algorithm
 
 function App() {
   return (
@@ -53,12 +50,9 @@ function App() {
           <Route path="/challenge/:name/:team1/:team2" element={<CreateChallenge />} />
           <Route path="/schedule" element={<Calendar />} />
           <Route path="/inbox" element={<Inbox/>} />
-<<<<<<< HEAD
           <Route path="/managematches/:divisionName" element={<ManageMatches/>} />
 
 
-=======
->>>>>>> Adding-Ladder-Algorithm
         </Routes>
       </Router>
       <ToastContainer />
