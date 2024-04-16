@@ -11,14 +11,14 @@ class TeamInDivisionSerializer(serializers.ModelSerializer):
         fields = ('division','team','position', 'division_name', 'team_name')
 
 class DivisionSerializer(serializers.ModelSerializer):
-    admin_email = serializers.SerializerMethodField()
+    admin_username = serializers.SerializerMethodField()
     
     class Meta:
         model = Division
-        fields = ('name','admin','publicProfile', 'admin_email','status')
+        fields = ('name','admin','publicProfile', 'admin_username','status')
 
-    def get_admin_email(self, obj):
-        return obj.admin.email
+    def get_admin_username(self, obj):
+        return obj.admin.username
 
 class MatchTableSerializer(serializers.ModelSerializer):
     division_name = serializers.CharField(source='division.name', read_only=True)

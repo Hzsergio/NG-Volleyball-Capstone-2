@@ -41,50 +41,81 @@ const UserChallenges = (isAdmin) => {
 
   return (
     <div>
-      <h1 className="main__title">
-        {userInfo && userInfo.first_name}'s Challenges
-      </h1>
-      <div className="division-container">
-        {userChallenges.map((challenge) => (
-          <div key={challenge.id} className="team-box">
-            {/* <p>Match ID: {challenge.id}</p> */}
-            <p>Division: {challenge.division}</p>
-            <p>
-              {challenge.team1_name} vs. {challenge.team2_name}
-            </p>
-            <p>
-              Status:{" "}
-              {challenge.status === "s"
-                ? "Scheduled"
-                : challenge.status === "i"
-                ? "In Progress"
-                :challenge.status === "f"
-                ? "Finished"
-                : challenge.status}
-            </p>
-            {/* Display schedule details if available */}
-            {challenge.courtSchedules && (
-              <div>
-                <p>
-                  Location: <br /> {challenge.courtSchedules.location}
-                </p>
-                <p>
-                  Start Time: <br /> {challenge.courtSchedules.startTime}
-                </p>
-                <p>
-                  Match Detail: <br /> {challenge.courtSchedules.matchDetail}
-                </p>
+
+
+
+      <div className="px-4 sm:px-0">
+        <h3 className="nameofpage">My Challenges </h3>
+      </div>
+      <div className="mt-6">
+        {userChallenges.reduce((chunks, challenge, index) => {
+          if (index % 3 === 0) chunks.push([]);
+          chunks[chunks.length - 1].push(challenge);
+          return chunks;
+        }, []).map((chunk, index) => (
+          <div key={index} className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 p-4">
+            {chunk.map(challenge => (
+              <div key={challenge.id} className="bg-white shadow overflow-hidden sm:rounded-lg">
+                <div className="px-4 py-5 sm:px-6">
+                  <h3 className="text-lg leading-6 font-medium text-gray-900">Challenge ID: {challenge.id}</h3>
+                </div>
+                <div className="border-t border-gray-200 px-4 py-5 sm:p-0">
+                  <dl className="sm:divide-y sm:divide-gray-200">
+                    <div className="flex flex-col sm:flex-row sm:divide-x sm:divide-gray-200">
+                      <div className="px-4 py-2 sm:w-1/3">
+                        <dt className="text-sm font-medium text-gray-500">Division</dt>
+                        <dd className="mt-1 text-sm text-gray-900">{challenge.division}</dd>
+                      </div>
+                      <div className="px-4 py-2 sm:w-1/3">
+                        <dt className="text-sm font-medium text-gray-500">Teams</dt>
+                        <dd className="mt-1 text-sm text-gray-900">{challenge.team1_name} vs. {challenge.team2_name}</dd>
+                      </div>
+                      <div className="px-4 py-2 sm:w-1/3">
+                        <dt className="text-sm font-medium text-gray-500">Status</dt>
+                        <dd className="mt-1 text-sm text-gray-900">{challenge.status === "s" ? "Scheduled" : challenge.status === "i" ? "In Progress" : challenge.status === "f" ? "Finished" : challenge.status}</dd>
+                      </div>
+                    </div>
+                    {challenge.courtSchedules && (
+                      <div className="flex flex-col sm:flex-row sm:divide-x sm:divide-gray-200">
+                        <div className="px-4 py-2 sm:w-1/3">
+                          <dt className="text-sm font-medium text-gray-500">Location</dt>
+                          <dd className="mt-1 text-sm text-gray-900">{challenge.courtSchedules.location}</dd>
+                        </div>
+                        <div className="px-4 py-2 sm:w-1/3">
+                          <dt className="text-sm font-medium text-gray-500">Start Time</dt>
+                          <dd className="mt-1 text-sm text-gray-900">{challenge.courtSchedules.startTime}</dd>
+                        </div>
+                        <div className="px-4 py-2 sm:w-1/3">
+                          <dt className="text-sm font-medium text-gray-500">Match Detail</dt>
+                          <dd className="mt-1 text-sm text-gray-900">{challenge.courtSchedules.matchDetail}</dd>
+                        </div>
+                      </div>
+                    )}
+                    <div className="px-4 py-2 sm:w-full">
+                      <dt className="text-sm font-medium text-gray-500">Actions</dt>
+
+
+                      <div class="inline-flex rounded-lg shadow-sm">
+                        <button type="button" class="py-3 px-4 inline-flex items-center gap-x-2 -ms-px first:rounded-s-lg first:ms-0 last:rounded-e-lg text-sm font-medium focus:z-10 border border-gray-200 bg-blue-100 text-gray-800 shadow-sm hover:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-slate-900 dark:border-gray-700 dark:text-white dark:hover:bg-gray-800 sm:p-5">
+                          Accept
+                        </button>
+                        <button type="button" class="py-3 px-4 inline-flex items-center gap-x-2 -ms-px first:rounded-s-lg first:ms-0 last:rounded-e-lg text-sm font-medium focus:z-10 border border-gray-200 bg-red-50 text-gray-800 shadow-sm hover:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-slate-900 dark:border-gray-700 dark:text-white dark:hover:bg-gray-800 sm:p-5">
+                          Reschedule
+                        </button>
+                        <button type="button" class="py-3 px-4 inline-flex items-center gap-x-2 -ms-px first:rounded-s-lg first:ms-0 last:rounded-e-lg text-sm font-medium focus:z-10 border border-gray-200 bg-gray-100 text-gray-800 shadow-sm hover:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-slate-900 dark:border-gray-700 dark:text-white dark:hover:bg-gray-800 sm:p-5">
+                          Report Score
+                        </button>
+                      </div>
+
+                    </div>
+                  </dl>
+                </div>
               </div>
-            )}
-
-
-                <button className="btn btn-secondary">Accept</button>
-                <button className="btn btn-secondary">Reschedule</button>
-
-              <button className="btn btn-primary">Report Score</button>
+            ))}
           </div>
         ))}
       </div>
+
     </div>
   );
 };
