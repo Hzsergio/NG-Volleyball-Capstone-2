@@ -82,7 +82,7 @@ class MatchTableView(viewsets.ViewSet):
             match_result = MatchTable.objects.filter(division=division)
 
         # Serialize match results excluding 'id' and 'countdown'
-        serializer = self.serializer_class(match_result, many=True)
+        serializer = self.serializer_class(match_result, many=True)#, exclude=['id', 'countDown'])
         return Response(serializer.data)
     
  
@@ -175,6 +175,19 @@ class MatchTableView(viewsets.ViewSet):
         # Serialize the matches
         serializer = self.serializer_class(user_matches, many=True)
         
+        # Return serialized matches as response
+        return Response(serializer.data)
+    
+    @action(detail=False, methods=['GET'], url_path=r'division-matches/(?P<divisionName>[^/.]+)')
+    def division_matches(self, request, divisionName=None):
+        # Get teams associated with the division
+        division_matches = MatchTable.objects.filter(division=divisionName)
+        
+
+        # Serialize the matches
+        serializer = self.serializer_class(division_matches, many=True)
+        
+
         # Return serialized matches as response
         return Response(serializer.data)
     
