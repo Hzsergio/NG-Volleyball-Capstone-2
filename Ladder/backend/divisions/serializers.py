@@ -15,7 +15,7 @@ class DivisionSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Division
-        fields = ('name','admin','publicProfile', 'admin_username','status')
+        fields = ('name','admin','publicProfile', 'admin_username','status', 'description')
 
     def get_admin_username(self, obj):
         return obj.admin.username
