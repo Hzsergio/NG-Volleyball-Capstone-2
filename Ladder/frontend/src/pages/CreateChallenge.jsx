@@ -11,8 +11,6 @@ const CreateChallenge = () => {
   const { name, team1, team2 } = useParams();
   const [divisionDetails, setDivisionDetails] = useState([]);
   const [teamDetails, setTeamDetails] = useState({});
-  const [matchID, setMatchID] = useState(null);
-  const [challengeCreated, setChallengeCreated] = useState(false);
 
   useEffect(() => {
     const fetchDivisionDetails = async () => {
@@ -40,24 +38,6 @@ const CreateChallenge = () => {
     dispatch(getUserInfo());
   }, [name, dispatch]);
 
-  const handleCreateChallenge = async () => {
-    try {
-      const challengeResponse = await axios.post('http://localhost:8000/MatchTable/', {
-        team1Name: team1,
-        team2Name: team2,
-        division: name,
-        ref: divisionDetails.admin,
-        countDown: new Date().toISOString().split('T')[0],
-        status: 's',
-      });
-      console.log(challengeResponse.data.id)
-      console.log('Challenge created successfully');
-      setMatchID(challengeResponse.data.id);
-      setChallengeCreated(true);
-    } catch (error) {
-      console.error('Error creating challenge:', error);
-    }
-  };
 
   return (
     <div>
@@ -74,13 +54,7 @@ const CreateChallenge = () => {
             ))}
           </ul>
         </div>
-
-        <button className='btn btn-primary' onClick={handleCreateChallenge}>Challenge</button>
-        <br/>
-        
-
-
-        {challengeCreated && <Calendar matchID={matchID} />}
+          <Calendar name={name} team1={team1} team2={team2}/>
       </div>
     </div>
   );

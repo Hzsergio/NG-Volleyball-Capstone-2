@@ -27,11 +27,13 @@ const Dashboard = () => {
     console.log(userInfo)
 
     fetchUserTeams();
+
   }, [userInfo]); // Only run the effect when userInfo changes
 
   useEffect(() => {
     // Fetch user information when the component mounts
     dispatch(getUserInfo());
+    console.log("Current User", userInfo.id)
   }, []); // Only run the effect once when the component mounts
 
   return (

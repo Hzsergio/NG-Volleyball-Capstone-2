@@ -20,7 +20,7 @@ const DivisionsPage = () => {
   }, []);
 
   return (
-    <div>
+    <div className='justify-content: center '>
       <h1 className="main__title" >Divisions</h1>
 
 

@@ -1,28 +1,18 @@
-import TestComponent from '../components/TestComponent'
-import React, { useState, useEffect } from "react";
-import { useSelector, useDispatch } from "react-redux";
-import { getUserInfo } from '../features/auth/authSlice'; // Import the getUserInfo action
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { useNavigate} from 'react-router-dom'
+import { toast } from 'react-toastify'
+import { useSelector, useDispatch } from 'react-redux';
+import { getUserInfo } from '../features/auth/authSlice';
 
 
-const Test = () => {
-    const dispatch = useDispatch(); // Get the dispatch function
 
-    const { userInfo } = useSelector((state) => state.auth);
+const Test = ({name, team1, team2}) => {
+  const dispatch = useDispatch();
 
-    useEffect(() => {
-        dispatch(getUserInfo());
-      }, [dispatch]);
-
-    useEffect(() => {
-        console.log(userInfo);
-
-      }, [userInfo]);
-
-    return (
-        <div>
-            Hello
-        </div>
-    );
-};
+  return (
+    <div>Test </div>
+  );
+}
 
 export default Test;
