@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework import viewsets, permissions, status
 from rest_framework.decorators import api_view
 
-from django.db.models import F,Q
+from django.db.models import F,Q, Count
 from .models import Division,TeamInDivision, Team, User
 from match.models import MatchTable
 from .serializers import DivisionSerializer,TeamInDivisionSerializer, MatchTableSerializer
@@ -215,6 +215,14 @@ class TeamInDivisionView(viewsets.ViewSet):
 
         return Response({'message': 'Positions assigned successfully.'})
     
+    @action(detail=False, methods=['GET'], url_path='total-ranks/(?P<division_name>[^/.]+)')
+    def remake_tree(self, request, division_name=None):
+        division404 = get_object_or_404(Division, name=division_name)
+
+        total_rank_count = TeamInDivision.objects.filter(division=division404).values('position').annotate(rank_count=Count('position')).count()
+
+        return Response({total_rank_count})
+    
     # need to check match status of other team -need to test
     @action(detail=False, methods=['GET'], url_path='challengeable-teams/(?P<division_name>[^/.]+)/(?P<team_name>[^/.]+)')
     def challengeable_teams(self, request, division_name=None,team_name=None):
@@ -224,7 +232,7 @@ class TeamInDivisionView(viewsets.ViewSet):
         current_position = team_in_division.position
 
         #this returns avaialbe challengable teams
-        challengeables = TeamInDivision.objects.filter(division=division404,position=current_position - 1).values_list('team__name', flat=True)
+        challengeables = TeamInDivision.objects.filter(division=division404,position=current_position - 1)
 
         #removes all the challengeable teams that are in a match
         challengeables = challengeables.exclude(
@@ -232,13 +240,28 @@ class TeamInDivisionView(viewsets.ViewSet):
             Q(team__team2_matches__status=MatchTable.Status.INPROGRESS) |
             Q(team__team1_matches__status=MatchTable.Status.SCHEDULED) |
             Q(team__team2_matches__status=MatchTable.Status.SCHEDULED)
-        ).values_list('team__name', flat=True)
+        )
+        serializer = TeamInDivisionSerializer(challengeables, many=True)
 
-        return Response(challengeables)
+        return Response(serializer.data)
     
         #this version returns the whole row
         #challengeables = TeamInDivision.objects.filter(division=division404,position=current_position -1)
         #serializer = self.serializer_class(challengeables, many=True)
         #serializer = self.serializer_class(challengeables, many=True)
         #return Response(serializer.data)
+
+    @action(detail=False, methods=['GET'], url_path='available-teams/(?P<division_name>[^/.]+)/(?P<team_name>[^/.]+)')
+    def available_teams(self, request, division_name=None,team_name=None):
+        division404 = get_object_or_404(Division, name=division_name)
+        team404 = get_object_or_404(Team, name=team_name)
+        team_in_division = get_object_or_404(TeamInDivision, division=division404, team=team404)
+        current_position = team_in_division.position
+
+        #this returns avaialbe challengable teams
+        challengeables = TeamInDivision.objects.filter(division=division404,position=current_position - 1)
+
+        serializer = TeamInDivisionSerializer(challengeables, many=True)
+
+        return Response(serializer.data)
     
