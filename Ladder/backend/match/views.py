@@ -11,7 +11,7 @@ from collections import defaultdict
 import json
 from django.http import JsonResponse
 from .models import *
-from django.db.models import Q, F
+from django.db.models import Q, F, Case, When, IntegerField
 from django.http import JsonResponse
 
 
@@ -171,7 +171,22 @@ class MatchTableView(viewsets.ViewSet):
         user_matches = MatchTable.objects.filter(
             Q(team1Name__in=user_teams) | Q(team2Name__in=user_teams)
         )
-        
+
+        # Define a custom ordering based on status
+        status_ordering = Case(
+            When(status='s', then=0),
+            When(status='i', then=1),
+            When(status='r', then=2),
+            When(status='f', then=3),
+            default=4,
+            output_field=IntegerField(),
+        )
+
+        # Sort the matches based on status ordering
+        user_matches = user_matches.annotate(
+            status_order=status_ordering
+        ).order_by('status_order')
+
         # Serialize the matches
         serializer = self.serializer_class(user_matches, many=True)
         
@@ -227,6 +242,18 @@ class CourtScheduleView(viewsets.ViewSet):
         project = self.queryset.get(pk=pk)
         serializer = self.serializer_class(project)
         return Response(serializer.data)
+
+    def put(self, request, pk, format=None):
+        try:
+            instance = CourtSchedule.objects.get(pk=pk)
+        except CourtSchedule.DoesNotExist:
+            return Response({"error": "CourtSchedule not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = CourtScheduleSerializer(instance, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     @action(detail=False, methods=['GET'], url_path=r'match-court/(?P<match_id>\d+)')
     def get_court_schedule(self, request, match_id=None):
