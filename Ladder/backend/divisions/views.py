@@ -236,7 +236,7 @@ class TeamInDivisionView(viewsets.ViewSet):
         return Response({'message': 'Positions assigned successfully.'})
     
     @action(detail=False, methods=['GET'], url_path='total-ranks/(?P<division_name>[^/.]+)')
-    def remake_tree(self, request, division_name=None):
+    def total_rank(self, request, division_name=None):
         division404 = get_object_or_404(Division, name=division_name)
 
         total_rank_count = TeamInDivision.objects.filter(division=division404).values('position').annotate(rank_count=Count('position')).count()
