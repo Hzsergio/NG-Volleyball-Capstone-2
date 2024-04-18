@@ -112,6 +112,8 @@ const ManageMatches = () => {
             <option value="">All Status</option>
             <option value="s">Scheduled</option>
             <option value="i">In Progress</option>
+            <option value="r">Reported</option>
+
             <option value="f">Finished</option>
           </select>
         </div>
@@ -163,6 +165,9 @@ const ManageMatches = () => {
 
                     <div className="inline-flex rounded-lg shadow-sm">
                       {challenge.status === "i" && (
+                        <SubmitResult selectedMatch={challenge} />
+                      )}
+                                            {challenge.status === "r" && (
                         <SubmitResult selectedMatch={challenge} />
                       )}
                       <button type="button" class="py-3 px-4 inline-flex items-center gap-x-2 -ms-px first:rounded-s-lg first:ms-0 last:rounded-e-lg text-sm font-medium focus:z-10 border border-gray-200 bg-gray-100 text-gray-800 shadow-sm hover:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-slate-900 dark:border-gray-700 dark:text-white dark:hover:bg-gray-800 sm:p-5">

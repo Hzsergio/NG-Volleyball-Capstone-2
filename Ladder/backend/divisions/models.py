@@ -9,6 +9,7 @@ class Division(models.Model):
     admin = models.ForeignKey(User, on_delete=models.CASCADE)
     publicProfile = models.ImageField(upload_to='profile_images', blank= True, null=True)
     description = models.TextField(blank=True, null=True)
+    category = models.TextField(blank=True, null=True)
 
     class Status(models.TextChoices):
        NotStarted = 'n', 'notStated'

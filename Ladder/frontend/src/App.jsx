@@ -25,6 +25,7 @@ import Calendar from "./pages/Calendar";
 import Inbox from "./pages/Inbox";
 import ManageMatches from "./pages/ManageMatches";
 import Test from "./pages/Test";
+import DivisionSettings from "./pages/DivisionSettings";
 
 function App() {
   return (
@@ -59,6 +60,8 @@ function App() {
             <Route path="/schedule" element={<Calendar />} />
             <Route path="/inbox" element={<Inbox />} />
             <Route path="/managematches/:divisionName" element={<ManageMatches />} />
+            <Route path="/division/settings/:divisionName" element={<DivisionSettings />} />
+
           </Route>
 
 
