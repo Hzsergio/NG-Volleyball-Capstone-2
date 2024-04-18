@@ -35,7 +35,27 @@ class DivisionView(viewsets.ViewSet):
         project = self.queryset.get(pk=pk)
         serializer = self.serializer_class(project)
         return Response(serializer.data)
+    
+    @action(detail=False, methods=['POST'], url_path='delete_division/(?P<division_name>[^/.]+)')
+    def delete_division(self, request, division_name=None):
+        division404 = get_object_or_404(Division, name=division_name)
+        if division404.status != Division.Status.FINISHED:
+            return Response({'error': f'Division {division_name} is not finished.'}, status=status.HTTP_400_BAD_REQUEST)
 
+        #deletes the division
+        division404.delete()
+        return Response({'message': f'Division {division_name} left successfully.'}, status=status.HTTP_200_OK)
+    
+    @action(detail=False, methods=['POST'], url_path='change_admin/(?P<division_name>[^/.]+)/(?P<new_admin_id>\d+)')
+    def change_admin(self, request, division_name=None, new_admin_id=None):
+        division = get_object_or_404(Division, name=division_name)
+        new_admin = get_object_or_404(User, pk=new_admin_id)
+
+        # Update the division admin
+        division.admin = new_admin
+        division.save()
+
+        return Response({'message': f'Admin of division {division_name} changed successfully to user {new_admin_id}.'}, status=status.HTTP_200_OK)
 class Tree:
     def __init__(self):
         self.positionNum = 0
@@ -264,4 +284,25 @@ class TeamInDivisionView(viewsets.ViewSet):
         serializer = TeamInDivisionSerializer(challengeables, many=True)
 
         return Response(serializer.data)
+    
+    #not in schedule or inprogress
+    @action(detail=False, methods=['DELETE'], url_path='leave_division/(?P<division_name>[^/.]+)/(?P<team_name>[^/.]+)')
+    def leave_division(self, request, division_name=None,team_name=None):
+        division404 = get_object_or_404(Division, name=division_name)
+        team404 = get_object_or_404(Team, name=team_name)
+        team_in_division = get_object_or_404(TeamInDivision, division=division404, team=team404)
+        
+        # Check if the team has any matches with status 'inProgress' or 'scheduled'
+        has_matches = MatchTable.objects.filter(
+            division=division404,
+            team1Name=team404,
+            status__in=[MatchTable.Status.INPROGRESS, MatchTable.Status.SCHEDULED]
+        ).exists()
+
+        if has_matches:
+            return Response({'message': 'Cannot leave division. Team has matches in progress or scheduled.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        #delete that row when meet condition
+        team_in_division.delete()
+        return Response({'message': f'Team {team_name} left division {division_name} successfully.'}, status=status.HTTP_200_OK)
     
