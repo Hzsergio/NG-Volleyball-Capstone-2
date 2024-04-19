@@ -48,6 +48,8 @@ export default function CustomizedTables() {
   const [currentTeam, setCurrentTeam] = useState(null); 
   const { userInfo } = useSelector((state) => state.auth);
   const dispatch = useDispatch(); // Get the dispatch function
+  const [challengeableTeams, setChallengeableTeams] = useState([]);
+
 
 
   useEffect(() => {
@@ -68,16 +70,40 @@ export default function CustomizedTables() {
         // Fetch current team of the user
         const currentTeamResponse = await axios.get(`http://localhost:8000/teamindivision/current-team/${name}/${userInfo.id}/`);
         console.log('Current Team:', currentTeamResponse.data);
-        setCurrentTeam(currentTeamResponse.data.team_id);
+
+        setCurrentTeam(currentTeamResponse.data);
       } catch (error) {
         console.error('Error fetching current team:', error);
       }
     };
 
+
+
     fetchDivisionDetails();
     fetchCurrentTeam();
     dispatch(getUserInfo());
   }, [name, userInfo.id]);
+
+  const fetChallengableTeams = async () => {
+    try {
+      // Fetch current team of the user
+      const challengeableTeamsResponse = await axios.get(`http://localhost:8000/teamindivision/challengeable-teams/${name}/${currentTeam.name}/`);
+      console.log('Challengable Teams:', challengeableTeamsResponse.data);
+      console.log('NAME:', currentTeam.name);
+      setChallengeableTeams(challengeableTeamsResponse.data.map(team => team.team_name));
+
+    } catch (error) {
+      console.error('Error fetching challengeableTeams:', error);
+    }
+  };
+
+  useEffect(() => {
+
+    if (currentTeam !== "") {
+      // console.log("currentTeam", currentTeam)
+    fetChallengableTeams();
+    }
+  }, [currentTeam]); // Only run the effect once when the component mounts
 
 
   return (
@@ -105,13 +131,8 @@ export default function CustomizedTables() {
               <StyledTableCell align="right">{team.losses}</StyledTableCell>
               <StyledTableCell align="right">{team.ratio}</StyledTableCell>
               <StyledTableCell align="right">
-                {currentTeam !== team.team && (
-                  <Link
-                    to={`/challenge/${name}/${currentTeam}/${team.team}`}
-
-                  >
-                    <button className="btn btn-primary">Challenge</button>
-                  </Link>
+                {challengeableTeams.includes(team.team_name) && (
+                  <button className="btn btn-primary">Challenge</button>
                 )}
               </StyledTableCell>
             </StyledTableRow>

@@ -10,6 +10,7 @@ from match.models import MatchTable
 from .serializers import DivisionSerializer,TeamInDivisionSerializer, MatchTableSerializer
 from rest_framework.decorators import action
 from collections import defaultdict
+from team.serializers import TeamSerializer
 
 
 class DivisionView(viewsets.ViewSet):
@@ -179,6 +180,7 @@ class TeamInDivisionView(viewsets.ViewSet):
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
+
     @action(detail=False, methods=['GET'], url_path='current-team/(?P<division_name>[^/.]+)/(?P<user_id>\d+)')
     def current_team(self, request, division_name, user_id):
         try:
@@ -189,12 +191,14 @@ class TeamInDivisionView(viewsets.ViewSet):
             team = TeamInDivision.objects.filter(division=division, team__captain_id=user_id).first()
             
             if team:
-                return Response({'team_id': team.team_id})
+                # Serialize the team object
+                serializer = TeamSerializer(team.team)
+                return Response(serializer.data)
             else:
                 return Response({'error': 'User is not captain of any team in this division'}, status=404)
         except Exception as e:
             return Response({'error': str(e)}, status=500)
-
+        
     def get_queryset(self):
         division_name = self.kwargs['division_name']
         # Retrieve the division object by name

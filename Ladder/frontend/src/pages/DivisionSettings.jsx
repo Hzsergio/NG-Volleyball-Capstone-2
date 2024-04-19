@@ -54,6 +54,13 @@ const DivisionSettings = () => {
         <TextInput id="category" type="text" placeholder={divisionDetails.category} required />
       </div>
 
+      <div>
+        <div className="mb-2 block">
+          <Label htmlFor="description" value="Change Description" />
+        </div>
+        <TextInput id="description" type="text" placeholder={divisionDetails.description} required />
+      </div>
+
       
 
 
