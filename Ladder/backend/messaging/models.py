@@ -16,3 +16,16 @@ class Message(models.Model):
 
     def __str__(self):
         return f"From {self.sender} to {self.recipient} - {self.sent_time}"
+    
+
+    @classmethod
+    def get_message_threads(cls, user1, user2):
+        """
+        Retrieve message threads between two users.
+        """
+        # Query messages where either user1 is the sender and user2 is the recipient, or vice versa
+        messages = cls.objects.filter(
+            models.Q(sender=user1, recipient=user2) |
+            models.Q(sender=user2, recipient=user1)
+        ).order_by('sent_time')
+        return messages
