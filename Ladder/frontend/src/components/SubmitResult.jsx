@@ -8,9 +8,11 @@ function SubmitResults({ selectedMatch }) {
   const { userInfo } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
   const [teamScores, setTeamScores] = useState({
-    team1: '',
-    team2: ''
+    team1: selectedMatch.team1Wins|| '',
+    team2: selectedMatch.team2Wins || ''
   });
+
+
 
   // Function to handle score input changes
   const handleScoreChange = (team, score) => {

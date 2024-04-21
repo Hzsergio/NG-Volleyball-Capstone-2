@@ -14,7 +14,7 @@ const CreateChallenge = ({ name, team1, team2 }) => {
   const [scheduleData, setScheduleData] = useState({
     date: "",
     time: "",
-    location: "",
+    location: name.defaultLocation || "",
     description: "",
     match: "",
   });
@@ -180,7 +180,7 @@ const CreateChallenge = ({ name, team1, team2 }) => {
                   type="text"
                   id="location"
                   name="location"
-                  value={scheduleData.location}
+                  value={divisionDetails.defaultLocation}
                   onChange={handleChange}
                   className="mt-1 p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 block w-full"
                 />

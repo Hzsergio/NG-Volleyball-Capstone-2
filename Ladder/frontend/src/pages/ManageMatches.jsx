@@ -5,6 +5,8 @@ import { getUserInfo } from "../features/auth/authSlice";
 import { useParams } from "react-router-dom";
 import SubmitResult from "../components/SubmitResult"; // Import the SubmitResults component
 import CheckDivisionAdmin from '../components/CheckDivisionAdmin';
+import { Badge } from "flowbite-react";
+
 
 const ManageMatches = () => {
   const [divisionMatches, setDivisionMatches] = useState([]);
@@ -99,7 +101,6 @@ const ManageMatches = () => {
               onChange={(e) => setSearchTeam(e.target.value)}
               className="flex-grow" // Ensures the input takes up remaining space
             />
-            {/* SVG icon */}
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" className="w-4 h-4 opacity-70 ml-2">
               <path fillRule="evenodd" d="M9.965 11.026a5 5 0 1 1 1.06-1.06l2.755 2.754a.75.75 0 1 1-1.06 1.06l-2.755-2.754ZM10.5 7a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0Z" clipRule="evenodd" />
             </svg>
@@ -123,7 +124,7 @@ const ManageMatches = () => {
         </div>
       </div>
 
-      <div >
+      <div>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {divisionMatches.map((challenge) => (
             <div key={challenge.id} className="bg-white shadow overflow-hidden sm:rounded-lg">
@@ -139,9 +140,26 @@ const ManageMatches = () => {
                       <dd className="mt-1 text-sm text-gray-900">{challenge.team1_name} vs. {challenge.team2_name}</dd>
                     </div>
                     <div className="px-4 py-2 sm:w-1/3">
-                      <dt className="text-sm font-medium text-gray-500">Status</dt>
-                      <dd className="mt-1 text-sm text-gray-900">{challenge.status === "s" ? "Scheduled" : challenge.status === "i" ? "In Progress" : challenge.status === "f" ? "Finished" : challenge.status}</dd>
-                    </div>
+                        <dt className="text-sm font-medium text-gray-500">Status</dt>
+                        <dd className=" flex mt-1 text-sm text-gray-900">
+                          {challenge.status === "s" && (
+                            <Badge color="info">Scheduled</Badge>
+                          )}
+                          {challenge.status === "i" && (
+                            <Badge color="success">In Progress</Badge>
+                          )}
+                          {challenge.status === "f" && (
+                            <Badge color="dark">Finished</Badge>
+                          )}
+                          {challenge.status === "r" && (
+                            <Badge color="warning">Score Reported</Badge>
+                          )}
+                          {/* If challenge status doesn't match any specific badge, display the status itself */}
+                          {(challenge.status !== "s" && challenge.status !== "i" && challenge.status !== "f" && challenge.status !== "r") && (
+                            <span>{challenge.status}</span>
+                          )}
+                        </dd>
+                      </div> 
                   </div>
 
                   {challenge.courtSchedules && (
