@@ -23,13 +23,18 @@ const DivisionsPage = () => {
   return (
     <div>
       <h1 className="main__title">Divisions</h1>
+      <div className="flex justify-center">
+        <Link to="/createdivision">
+          <button className="btn btn-primary">Create New Division</button>
+        </Link>
+      </div>
 
       <div style={{ transform: 'scale(0.9)' }}>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6">
           {divisions.map((division, index) => (
             <div key={division.name} className={`max-w-sm rounded overflow-hidden shadow-lg mb-4 ${index % 4 === 0 ? 'pl-4' : ''}`}>
               <Link to={`/division/${division.name}`}>
-                <div className="max-w-sm rounded overflow-hidden shadow-lg mb-4">
+                <div className="division-card bg-white rounded overflow-hidden shadow-lg">
                   <img className="w-full" src="https://v1.tailwindcss.com/img/card-top.jpg" alt="" />
                   <div className="px-6 py-4">
                     <div className="font-bold text-xl mb-2">{division.name}</div>
@@ -50,9 +55,7 @@ const DivisionsPage = () => {
         </div>
       </div>
 
-      <Link to="/createdivision">
-        <button className="btn btn-primary">Create Division</button>
-      </Link>
+
     </div>
   );
 };
