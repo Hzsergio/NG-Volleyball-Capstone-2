@@ -194,6 +194,18 @@ class TeamInDivisionView(viewsets.ViewSet):
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
 
+    @action(detail=False, methods=['GET'], url_path='user_divisions/(?P<user_id>\d+)')
+    def user_divisions(self, request, user_id=None):
+        try:
+            # Get all team-in-division instances where the team is associated with the user
+            user_team_divisions = TeamInDivision.objects.filter(team__users=user_id)
+            # Extract divisions from the team-in-division instances
+            user_divisions = [team_in_division.division for team_in_division in user_team_divisions]
+            serializer = DivisionSerializer(user_divisions, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except Division.DoesNotExist:
+            return Response({"error": "Divisions not found"}, status=status.HTTP_404_NOT_FOUND)
+
     @action(detail=False, methods=['GET'], url_path='current-team/(?P<division_name>[^/.]+)/(?P<user_id>\d+)')
     def current_team(self, request, division_name, user_id):
         try:

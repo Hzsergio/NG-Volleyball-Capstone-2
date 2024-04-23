@@ -46,7 +46,7 @@ const DivisionDetailsPage = () => {
     fetchDivisionDetails();
     fetchCurrentTeam();
     dispatch(getUserInfo());
-  }, [name, userInfo.id]);
+  }, []);
 
   return (
     <div>
