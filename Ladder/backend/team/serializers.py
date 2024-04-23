@@ -13,7 +13,7 @@ class TeamSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Team
-        fields = ('id', 'name','captain', 'users', 'captain_username', 'member_usernames')
+        fields = ('id', 'name','captain', 'users', 'captain_username', 'member_usernames', 'description')
 
     def get_captain_username(self, obj):
         return obj.captain.username

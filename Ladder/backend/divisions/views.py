@@ -10,6 +10,7 @@ from match.models import MatchTable
 from .serializers import DivisionSerializer,TeamInDivisionSerializer, MatchTableSerializer
 from rest_framework.decorators import action
 from collections import defaultdict
+from team.serializers import TeamSerializer
 
 
 class DivisionView(viewsets.ViewSet):
@@ -36,6 +37,19 @@ class DivisionView(viewsets.ViewSet):
         serializer = self.serializer_class(project)
         return Response(serializer.data)
     
+    def update(self, request, pk=None):
+        try:
+            division = self.queryset.get(pk=pk)
+        except Division.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        serializer = self.serializer_class(division, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+
     @action(detail=False, methods=['POST'], url_path='delete_division/(?P<division_name>[^/.]+)')
     def delete_division(self, request, division_name=None):
         division404 = get_object_or_404(Division, name=division_name)
@@ -179,6 +193,19 @@ class TeamInDivisionView(viewsets.ViewSet):
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
+
+    @action(detail=False, methods=['GET'], url_path='user_divisions/(?P<user_id>\d+)')
+    def user_divisions(self, request, user_id=None):
+        try:
+            # Get all team-in-division instances where the team is associated with the user
+            user_team_divisions = TeamInDivision.objects.filter(team__users=user_id)
+            # Extract divisions from the team-in-division instances
+            user_divisions = [team_in_division.division for team_in_division in user_team_divisions]
+            serializer = DivisionSerializer(user_divisions, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except Division.DoesNotExist:
+            return Response({"error": "Divisions not found"}, status=status.HTTP_404_NOT_FOUND)
+
     @action(detail=False, methods=['GET'], url_path='current-team/(?P<division_name>[^/.]+)/(?P<user_id>\d+)')
     def current_team(self, request, division_name, user_id):
         try:
@@ -189,12 +216,14 @@ class TeamInDivisionView(viewsets.ViewSet):
             team = TeamInDivision.objects.filter(division=division, team__captain_id=user_id).first()
             
             if team:
-                return Response({'team_id': team.team_id})
+                # Serialize the team object
+                serializer = TeamSerializer(team.team)
+                return Response(serializer.data)
             else:
                 return Response({'error': 'User is not captain of any team in this division'}, status=404)
         except Exception as e:
             return Response({'error': str(e)}, status=500)
-
+        
     def get_queryset(self):
         division_name = self.kwargs['division_name']
         # Retrieve the division object by name
@@ -303,7 +332,7 @@ class TeamInDivisionView(viewsets.ViewSet):
         return Response(serializer.data)
     
     #not in schedule or inprogress
-    @action(detail=False, methods=['DELETE'], url_path='leave_division/(?P<division_name>[^/.]+)/(?P<team_name>[^/.]+)')
+    @action(detail=False, methods=['POST'], url_path='leave_division/(?P<division_name>[^/.]+)/(?P<team_name>[^/.]+)')
     def leave_division(self, request, division_name=None,team_name=None):
         division404 = get_object_or_404(Division, name=division_name)
         team404 = get_object_or_404(Team, name=team_name)
@@ -323,3 +352,45 @@ class TeamInDivisionView(viewsets.ViewSet):
         team_in_division.delete()
         return Response({'message': f'Team {team_name} left division {division_name} successfully.'}, status=status.HTTP_200_OK)
     
+
+    def order_teams_by_win_rate(self, team_list):
+        # Calculate win rate for each team
+        team_win_rates = {}
+        for team_in_division in team_list:
+            team = team_in_division.team
+            total_games_team1 = MatchTable.objects.filter(team1Name=team).count()
+            total_games_team2 = MatchTable.objects.filter(team2Name=team).count()
+            total_games = total_games_team1 + total_games_team2
+
+            team1_wins = MatchTable.objects.filter(team1Name=team, team1Wins__gt=F('team2Wins')).count()
+            team2_wins = MatchTable.objects.filter(team2Name=team, team2Wins__gt=F('team1Wins')).count()
+            total_wins = team1_wins + team2_wins
+
+            if total_games > 0:
+                win_rate = total_wins / total_games
+            else:
+                win_rate = 0
+
+            team_win_rates[team] = win_rate
+
+        # Sort teams based on win rate
+        sorted_teams = sorted(team_list, key=lambda team: team_win_rates[team.team], reverse=True)
+
+        # Assign positions
+        for i, team in enumerate(sorted_teams):
+            team.position = i + 1  # Positions start from 1
+
+
+    @action(detail=False, methods=['POST'], url_path='single-assign-positions/(?P<division_name>[^/.]+)')
+    def single_assign_positions(self, request, division_name=None):
+        division404 = get_object_or_404(Division, name=division_name)
+        team_list = TeamInDivision.objects.filter(division=division404)  # Get queryset without converting to list
+
+        # Call order_teams_by_win_rate method with the queryset
+        self.order_teams_by_win_rate(team_list)
+
+        # Save each team object to the database
+        for team in team_list:
+            team.save()
+
+        return Response({'message': 'Positions assigned successfully.'})

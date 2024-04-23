@@ -678,3 +678,11 @@ table {
     table.alt tfoot {
       border-top: 0;
     }
+
+    .division-card-wrapper {
+      height: 100%; /* Ensure that the wrapper fills the grid cell */
+  }
+  
+  .division-card {
+      height: 100%; /* Set a fixed height for each card */
+  }

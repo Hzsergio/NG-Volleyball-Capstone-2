@@ -2,10 +2,15 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useSelector, useDispatch } from "react-redux";
 import { getUserInfo } from "../features/auth/authSlice";
+import EditSchedule from "./EditSchedule";
+import ReportResult from "./ReportResult";
+import { Badge } from "flowbite-react";
 
-const UserChallenges = (isAdmin) => {
+
+const UserChallenges = () => {
   const [userChallenges, setUserChallenges] = useState([]);
   const { userInfo } = useSelector((state) => state.auth);
+
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -39,12 +44,28 @@ const UserChallenges = (isAdmin) => {
     dispatch(getUserInfo());
   }, []);
 
+  const handleAccept = async (challengeId) => {
+    // Ask for confirmation
+    const confirmAccept = window.confirm("Are you sure you want to accept this challenge?");
+    if (!confirmAccept) return; // If user cancels, do nothing
+
+    try {
+      await axios.put(
+        `http://localhost:8000/MatchTable/${challengeId}/`,
+        { status: "i" }
+      );
+      // Refresh the page
+      window.location.reload();
+    } catch (error) {
+      console.error("Error updating match status:", error);
+    }
+  };
+
+
   return (
     <div>
-
-
-
       <div className="px-4 sm:px-0">
+
         <h3 className="nameofpage">My Challenges </h3>
       </div>
       <div className="mt-6">
@@ -53,7 +74,7 @@ const UserChallenges = (isAdmin) => {
           chunks[chunks.length - 1].push(challenge);
           return chunks;
         }, []).map((chunk, index) => (
-          <div key={index} className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 p-4">
+          <div key={index} className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 p-4">
             {chunk.map(challenge => (
               <div key={challenge.id} className="bg-white shadow overflow-hidden sm:rounded-lg">
                 <div className="px-4 py-5 sm:px-6">
@@ -62,17 +83,34 @@ const UserChallenges = (isAdmin) => {
                 <div className="border-t border-gray-200 px-4 py-5 sm:p-0">
                   <dl className="sm:divide-y sm:divide-gray-200">
                     <div className="flex flex-col sm:flex-row sm:divide-x sm:divide-gray-200">
+                     
                       <div className="px-4 py-2 sm:w-1/3">
+                        <dt className="text-sm font-medium text-gray-500">Status</dt>
+                        <dd className=" flex mt-1 text-sm text-gray-900">
+                          {challenge.status === "s" && (
+                            <Badge color="info">Scheduled</Badge>
+                          )}
+                          {challenge.status === "i" && (
+                            <Badge color="success">In Progress</Badge>
+                          )}
+                          {challenge.status === "f" && (
+                            <Badge color="dark">Finished</Badge>
+                          )}
+                          {challenge.status === "r" && (
+                            <Badge color="warning">Score Reported</Badge>
+                          )}
+                          {/* If challenge status doesn't match any specific badge, display the status itself */}
+                          {(challenge.status !== "s" && challenge.status !== "i" && challenge.status !== "f" && challenge.status !== "r") && (
+                            <span>{challenge.status}</span>
+                          )}
+                        </dd>
+                      </div> <div className="px-4 py-2 sm:w-1/3">
                         <dt className="text-sm font-medium text-gray-500">Division</dt>
                         <dd className="mt-1 text-sm text-gray-900">{challenge.division}</dd>
                       </div>
                       <div className="px-4 py-2 sm:w-1/3">
                         <dt className="text-sm font-medium text-gray-500">Teams</dt>
                         <dd className="mt-1 text-sm text-gray-900">{challenge.team1_name} vs. {challenge.team2_name}</dd>
-                      </div>
-                      <div className="px-4 py-2 sm:w-1/3">
-                        <dt className="text-sm font-medium text-gray-500">Status</dt>
-                        <dd className="mt-1 text-sm text-gray-900">{challenge.status === "s" ? "Scheduled" : challenge.status === "i" ? "In Progress" : challenge.status === "f" ? "Finished" : challenge.status}</dd>
                       </div>
                     </div>
                     {challenge.courtSchedules && (
@@ -93,20 +131,21 @@ const UserChallenges = (isAdmin) => {
                     )}
                     <div className="px-4 py-2 sm:w-full">
                       <dt className="text-sm font-medium text-gray-500">Actions</dt>
+                      <div className="inline-flex rounded-lg shadow-sm">
+                        {challenge.status === "s" && (
+                          <button type="button" onClick={() => handleAccept(challenge.id)} className="py-3 px-4 inline-flex items-center gap-x-2 -ms-px first:rounded-s-lg first:ms-0 last:rounded-e-lg text-sm font-medium focus:z-10 border border-gray-200 bg-blue-100 text-gray-800 shadow-sm hover:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-slate-900 dark:border-gray-700 dark:text-white dark:hover:bg-gray-800 sm:p-5">
+                            Accept
+                          </button>
+                        )}
+                        {challenge.status === "i" && (
+                          <EditSchedule scheduleID={challenge.courtSchedules.id} />
+                        )}
 
-
-                      <div class="inline-flex rounded-lg shadow-sm">
-                        <button type="button" class="py-3 px-4 inline-flex items-center gap-x-2 -ms-px first:rounded-s-lg first:ms-0 last:rounded-e-lg text-sm font-medium focus:z-10 border border-gray-200 bg-blue-100 text-gray-800 shadow-sm hover:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-slate-900 dark:border-gray-700 dark:text-white dark:hover:bg-gray-800 sm:p-5">
-                          Accept
-                        </button>
-                        <button type="button" class="py-3 px-4 inline-flex items-center gap-x-2 -ms-px first:rounded-s-lg first:ms-0 last:rounded-e-lg text-sm font-medium focus:z-10 border border-gray-200 bg-red-50 text-gray-800 shadow-sm hover:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-slate-900 dark:border-gray-700 dark:text-white dark:hover:bg-gray-800 sm:p-5">
-                          Reschedule
-                        </button>
-                        <button type="button" class="py-3 px-4 inline-flex items-center gap-x-2 -ms-px first:rounded-s-lg first:ms-0 last:rounded-e-lg text-sm font-medium focus:z-10 border border-gray-200 bg-gray-100 text-gray-800 shadow-sm hover:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-slate-900 dark:border-gray-700 dark:text-white dark:hover:bg-gray-800 sm:p-5">
-                          Report Score
-                        </button>
+                        {/* Render ReportResult if challenge status is "i" or "r" */}
+                        {(challenge.status === "i" || challenge.status === "r") && (
+                          <ReportResult selectedMatch={challenge} />
+                        )}
                       </div>
-
                     </div>
                   </dl>
                 </div>
@@ -115,7 +154,6 @@ const UserChallenges = (isAdmin) => {
           </div>
         ))}
       </div>
-
     </div>
   );
 };

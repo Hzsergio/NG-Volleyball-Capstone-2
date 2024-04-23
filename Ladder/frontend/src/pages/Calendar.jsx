@@ -1,128 +1,226 @@
-import * as React from 'react';
-import dayjs from 'dayjs';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
-import TextField from '@mui/material/TextField';
-import Button from '@mui/material/Button';
-import Stack from '@mui/material/Stack';
-import IconButton from '@mui/material/IconButton';
-import CancelIcon from '@mui/icons-material/Cancel';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-import DialogTitle from '@mui/material/DialogTitle';
-import Typography from '@mui/material/Typography';
-import axios from 'axios';
-import { useNavigate} from 'react-router-dom'
-import { toast } from 'react-toastify'
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import { useDispatch } from "react-redux";
+import { getUserInfo } from "../features/auth/authSlice";
 
-export default function Calendar({ matchID }) {
-  const [match, setMatch] = React.useState({ value: dayjs(), location: '', matchDetail: '' });
-  const [openDialog, setOpenDialog] = React.useState(false);
-  const [teamName, setTeamName] = React.useState("team_name"); // Example team name, replace with actual team name variable
-  const navigate = useNavigate()
+const CreateChallenge = ({ name, team1, team2 }) => {
+  const [divisionDetails, setDivisionDetails] = useState([]);
+  const [matchID, setMatchID] = useState("");
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
-  const handleDateChange = (newValue) => {
-    setMatch({ ...match, value: newValue });
+  const [scheduleData, setScheduleData] = useState({
+    date: "",
+    time: "",
+    location: name.defaultLocation || "",
+    description: "",
+    match: "",
+  });
+
+  useEffect(() => {
+    const fetchDivisionDetails = async () => {
+      try {
+        const divisionResponse = await axios.get(
+          `http://localhost:8000/division/${name}`
+        );
+        console.log("Teams in Division API response:", divisionResponse.data);
+        setDivisionDetails(divisionResponse.data);
+      } catch (error) {
+        console.error("Error fetching division details:", error);
+      }
+    };
+
+    const fetchTeamDetails = async () => {
+      try {
+        const response = await axios.get(
+          `http://localhost:8000/team/${team2}/`
+        );
+        console.log("Team Details API response:", response.data);
+        setTeamDetails(response.data);
+      } catch (error) {
+        console.error("Error fetching team details:", error);
+      }
+    };
+
+    fetchDivisionDetails();
+    fetchTeamDetails();
+    dispatch(getUserInfo());
+  }, [name, dispatch]);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setScheduleData({
+      ...scheduleData,
+      [name]: value,
+    });
   };
 
-  const handleLocationChange = (event) => {
-    setMatch({ ...match, location: event.target.value });
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (window.confirm("Are you sure you want to submit the challenge?")) {
+      handleCreateChallenge();
+    }
   };
 
-  const handleMatchDetailChange = (event) => {
-    setMatch({ ...match, matchDetail: event.target.value });
+  const handleCreateChallenge = async () => {
+    try {
+      const challengeResponse = await axios.post(
+        "http://localhost:8000/MatchTable/",
+        {
+          team1Name: team1,
+          team2Name: team2,
+          division: name,
+          ref: divisionDetails.admin,
+          countDown: new Date().toISOString().split("T")[0],
+          status: "s",
+        }
+      );
+
+      // Set matchID state
+      setMatchID(challengeResponse.data.id);
+
+      console.log("Challenge created successfully");
+      console.log("Response data:", challengeResponse.data);
+    } catch (error) {
+      console.error("Error creating challenge:", error);
+    }
   };
 
-  const handleClose = () => {
-    setOpenDialog(false);
-  };
+  useEffect(() => {
+    if (matchID !== "") {
+      createSchedule();
+    }
+  }, [matchID]);
 
-  const handleConfirm = async () => {
+  const createSchedule = async () => {
     // Create CourtSchedule object with location and match detail
 
     try {
-    // Sending challenge request to the server
-    const scheduleResponse = await axios.post('http://localhost:8000/CourtSchedule/', {
-      match: matchID, // Use matchID passed as prop
-      location: match.location || '', // Use location if provided, otherwise empty string
-      startTime: match.value.toDate(), // Convert dayjs object to JavaScript Date object
-      matchDetail: match.matchDetail || '', // Use match detail if provided, otherwise empty string
-    });
-    console.log('Schedule Created Successfully');
-    console.log(scheduleResponse.data)
+      // Sending challenge request to the server
+      const scheduleResponse = await axios.post(
+        "http://localhost:8000/CourtSchedule/",
+        {
+          match: matchID, // Use matchID passed as prop
+          location: scheduleData.location || "", // Use location if provided, otherwise empty string
+          startTime: new Date(scheduleData.date + " " + scheduleData.time), // Convert dayjs object to JavaScript Date object
+          matchDetail: scheduleData.description || "", // Use match detail if provided, otherwise empty string
+        }
+      );
+      console.log("Schedule Created Successfully");
+      console.log(scheduleResponse.data);
     } catch (error) {
-      console.error('Error creating schedule:', error);
+      console.error("Error creating schedule:", error);
     }
-    
-    alert('Challenge request sent!'); // Placeholder for success message
-    setOpenDialog(false);
-    toast.success("Challenge Created Successfully")
-    navigate('/dashboard')
+
+    // Close the modal after creating schedule
+    document.getElementById("my_modal_1").close();
+    toast.success("Challenge Created Successfully");
+    navigate("/dashboard"); // Optionally navigate to another page
   };
 
-  const handleOpenDialog = () => {
-    setOpenDialog(true);
+  const closeModal = () => {
+    document.getElementById("my_modal_1").close();
   };
 
-  const deleteChallenge = async () => {
-    try {
-    const deleteResponse = await axios.delete(`http://localhost:8000/MatchTable/${matchID}`);
-    console.log('Delete response:', deleteResponse.data);
-    navigate(`/division/${matchID}`)
-    } catch (error){
-      console.error('Error deleting details:', error);
-
-    }
-  };
   return (
-    <LocalizationProvider dateAdapter={AdapterDayjs} >
-      <Stack spacing={3} >
-        <Typography variant="h4" gutterBottom>
-          Schedule
-        </Typography>
-        <Stack direction="row" spacing={1} alignItems="center">
-          <DateTimePicker
-            renderInput={(props) => <TextField {...props} fullWidth />}
-            label={`Match Date and Time`}
-            value={match.value}
-            onChange={handleDateChange}
-          />
-          <TextField
-            label={`Location`}
-            value={match.location}
-            onChange={handleLocationChange}
-          />
-          <TextField
-            label={`Match Details`}
-            value={match.matchDetail}
-            onChange={handleMatchDetailChange}
-          />
-        </Stack>
-        <Button variant="outlined" onClick={handleOpenDialog} >Send Challenge Request</Button>
-        <button className='btn btn-red' onClick={deleteChallenge}>Cancel</button>
-      </Stack>
-      <Dialog
-        open={openDialog}
-        onClose={handleClose}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
+    <div>
+      <button
+        className="btn btn-primary"
+        onClick={() => document.getElementById("my_modal_1").showModal()}
       >
-        <DialogTitle id="alert-dialog-title">{"Confirm Challenge Request"}</DialogTitle>
-        <DialogContent>
-          <DialogContentText id="alert-dialog-description">
-            Are you sure this is the correct date and time for your challenge?
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClose}>Cancel</Button>
-          <Button onClick={handleConfirm} autoFocus>
-            Confirm
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </LocalizationProvider>
+        Challenge
+      </button>
+      <dialog id="my_modal_1" className="modal">
+        <div className="modal-box" style={{ background: "#f4f4f4" }}>
+          <h2>Schedule Math</h2>
+          <div className="max-w-md mx-auto mt-8">
+            <form onSubmit={handleSubmit}>
+              <div className="mb-4">
+                <label
+                  htmlFor="date"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Date
+                </label>
+                <input
+                  type="date"
+                  id="date"
+                  name="date"
+                  value={scheduleData.date}
+                  onChange={handleChange}
+                  className="mt-1 p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 block w-full"
+                />
+              </div>
+              <div className="mb-4">
+                <label
+                  htmlFor="time"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Time
+                </label>
+                <input
+                  type="time"
+                  id="time"
+                  name="time"
+                  value={scheduleData.time}
+                  onChange={handleChange}
+                  className="mt-1 p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 block w-full"
+                />
+              </div>
+              <div className="mb-4">
+                <label
+                  htmlFor="location"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Location
+                </label>
+                <input
+                  type="text"
+                  id="location"
+                  name="location"
+                  value={divisionDetails.defaultLocation}
+                  onChange={handleChange}
+                  className="mt-1 p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 block w-full"
+                />
+              </div>
+              <div className="mb-4">
+                <label
+                  htmlFor="description"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Description
+                </label>
+                <textarea
+                  id="description"
+                  name="description"
+                  value={scheduleData.description}
+                  onChange={handleChange}
+                  className="mt-1 p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 block w-full"
+                ></textarea>
+              </div>
+              <div className="flex justify-between">
+                <button
+                  type="button"
+                  className="bg-red-500 text-white py-2 px-4 rounded-md hover:bg-red-600 focus:outline-none focus:bg-red-600"
+                  onClick={closeModal}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="w-32 bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 focus:outline-none focus:bg-blue-600"
+                >
+                  Submit
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </dialog>
+    </div>
   );
-}
+};
+
+export default CreateChallenge;

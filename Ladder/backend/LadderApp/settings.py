@@ -150,7 +150,7 @@ SIMPLE_JWT = {
     "AUTH_HEADER_TYPES": (
         "Bearer",
         "JWT"),
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=120),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=60),
     "SIGNING_KEY": "RtEMnUvriw7WyadqEL8VL5Dx8T3ZrTGl",
     "AUTH_HEADER_NAME": "HTTP_AUTHORIZATION",

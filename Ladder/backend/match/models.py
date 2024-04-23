@@ -14,10 +14,11 @@ class MatchTable(models.Model):
     team2Wins = models.IntegerField(default=0)
     
     class Status(models.TextChoices):
-       INPROGRESS = 'i', 'inProgress' 
        SCHEDULED = 's', 'scheduled'
-       VOID = 'v', 'void'
+       INPROGRESS = 'i', 'inProgress' 
+       REPORTED = 'r', 'reported'
        FINISHED = 'f', 'finished'
+       VOID = 'v', 'void'
     status = models.CharField(max_length=1,choices=Status.choices,null=True)
 
     
