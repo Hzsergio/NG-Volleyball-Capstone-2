@@ -134,7 +134,7 @@ const CreateChallenge = ({ name, team1, team2 }) => {
       </button>
       <dialog id="my_modal_1" className="modal">
         <div className="modal-box" style={{ background: "#f4f4f4" }}>
-          <h2>Schedule Math</h2>
+          <h2>Schedule Match</h2>
           <div className="max-w-md mx-auto mt-8">
             <form onSubmit={handleSubmit}>
               <div className="mb-4">

@@ -52,7 +52,7 @@ const DivisionDetailsPage = () => {
     <div>
       <CheckDivisionAdmin divisionName={name} userId={userInfo.id} />
 
-      <h1>{name} Division</h1>
+      <h1>{name} </h1>
 
       <CustomizedTables />
 

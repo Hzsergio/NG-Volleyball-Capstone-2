@@ -13,6 +13,7 @@ class Division(models.Model):
     description = models.TextField(blank=True, null=True)
     category = models.TextField(blank=True, null=True)
     defaultLocation = models.TextField(blank=True, null=True)
+    group_settings = models.JSONField(default=dict)
 
     TOURNAMENT_TYPE_CHOICES = [
         ('single', 'Single'),
