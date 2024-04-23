@@ -96,6 +96,17 @@ DATABASES = {
     }
 }
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
+#         'NAME': 'LadderDB',
+#         'USER': 'postgres',
+#         'PASSWORD': 'password',
+#         'HOST': 'localhost',
+#         'PORT': '5432',
+#     }
+# }
+
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
@@ -150,7 +161,7 @@ SIMPLE_JWT = {
     "AUTH_HEADER_TYPES": (
         "Bearer",
         "JWT"),
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=120),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=60),
     "SIGNING_KEY": "RtEMnUvriw7WyadqEL8VL5Dx8T3ZrTGl",
     "AUTH_HEADER_NAME": "HTTP_AUTHORIZATION",

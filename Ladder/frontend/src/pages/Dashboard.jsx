@@ -47,10 +47,11 @@ const Dashboard = () => {
 
       <h1 className='nameofpage'> My Teams</h1> {/* Use userInfo && userInfo.first_name to avoid rendering before userInfo is available */}
       <GetTeams  userInfo={userInfo}/>
+      <div className='flex justify-center py-5'>
       <Link to="/createteam">
         <button className="btn btn-primary justify-center " >Create Team</button>
       </Link>
-
+</div>
     </div>
   );
 };
