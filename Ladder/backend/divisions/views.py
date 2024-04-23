@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework import viewsets, permissions, status
 from rest_framework.decorators import api_view
 
-from django.db.models import F,Q, Count
+from django.db.models import F,Q, Count, Max
 from .models import Division,TeamInDivision, Team, User
 from match.models import MatchTable
 from .serializers import DivisionSerializer,TeamInDivisionSerializer, MatchTableSerializer
@@ -235,6 +235,23 @@ class TeamInDivisionView(viewsets.ViewSet):
 
         return Response({'message': 'Positions assigned successfully.'})
     
+    @action(detail=False, methods=['POST'], url_path='fix-ladder/(?P<division_name>[^/.]+)')
+    def fix_ladder(self, request, division_name=None):
+        division404 = get_object_or_404(Division, name=division_name)
+
+        teams = TeamInDivision.objects.filter(division=division404).order_by('position')  
+        max_position = teams.aggregate(Max('position'))['position__max']
+        
+        # Iterate through each position
+        for position in range(0, max_position):
+            try:
+                team = teams.get(position=position)
+            except TeamInDivision.DoesNotExist:
+                # If the position is empty, increment the positions of subsequent teams
+                TeamInDivision.objects.filter(division=division404, position__gt=position).update(position=F('position') - 1)
+        return Response({'message': 'Ladder positions fixed successfully.'})
+        
+
     @action(detail=False, methods=['GET'], url_path='total-ranks/(?P<division_name>[^/.]+)')
     def total_rank(self, request, division_name=None):
         division404 = get_object_or_404(Division, name=division_name)
