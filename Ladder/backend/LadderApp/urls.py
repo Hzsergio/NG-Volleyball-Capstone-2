@@ -8,7 +8,8 @@ urlpatterns = [
     path('',include('team.urls')),
     path('',include('users.urls')),
     path('',include('divisions.urls')),
-    path('',include('match.urls') )
+    path('',include('match.urls') ),
+    path('',include('messaging.urls'))
 ]
 
 

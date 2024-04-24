@@ -85,18 +85,22 @@ class MatchTableView(viewsets.ViewSet):
         serializer = self.serializer_class(match_result, many=True)#, exclude=['id', 'countDown'])
         return Response(serializer.data)
     
- 
-    @action(detail=False, methods=['GET'], url_path=r'table_view/(?P<team_name>[^/.]+)')
-    def table_view(self, request, team_name=None):
+    #make the team_name also optional to seach through division for everyones info
+    @action(detail=False, methods=['GET'], url_path=r'table_view/(?P<team_name>[^/.]+)(?:/(?P<division_name>[^/.]+))?')
+    def table_view(self, request, team_name=None, division_name = None):
         team = get_object_or_404(Team, name=team_name)
         
+        if division_name:
+            division404 = get_object_or_404(Division, name=division_name)
+            matches = MatchTable.objects.filter(division = division404)
+            total_wins = MatchTable.objects.filter(division = division404)
         #get total matches
         matches = MatchTable.objects.filter(Q(team1Name=team) | Q(team2Name=team), status=MatchTable.Status.FINISHED)
         total_games = matches.count()
 
         #to get wins and loses
-        total_wins = matches.filter(team1Name=team, team1Wins__gt=F('team2Wins')).count() + \
-                     matches.filter(team2Name=team, team2Wins__gt=F('team1Wins')).count()
+        total_wins = matches.filter(team1Name =team,winner = 0,status='f').count() + \
+                     matches.filter(team2Name=team, winner = 1,status = 'f').count()
         total_losses = total_games - total_wins
 
         # Calculate win rate
@@ -115,6 +119,7 @@ class MatchTableView(viewsets.ViewSet):
 
         return Response(response_data)
     
+    #need to fix this
     @action(detail=False, methods=['POST'], url_path=r'submit-results/(?P<match_id>[^/.]+)')
     def submit_results(self, request, match_id=None):
         try:

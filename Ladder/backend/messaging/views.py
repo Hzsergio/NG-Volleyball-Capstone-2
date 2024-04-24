@@ -2,8 +2,43 @@ from django.shortcuts import render, get_object_or_404
 from django.http import JsonResponse
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from rest_framework import viewsets, permissions, status
 from .models import Message
 from .serializers import MessageSerializer
+
+
+class MessageViewSet(viewsets.ModelViewSet):
+    queryset = Message.objects.all()
+    serializer_class = MessageSerializer
+    #def get_queryset(self):
+        # Filter messages where the recipient is the current authenticated user
+      #  return Message.objects.filter(recipient=self.request.user)   
+    
+
+class Messages(viewsets.ModelViewSet):
+    queryset = Message.objects.all()
+    serializer_class = MessageSerializer
+    permission_classes = [permissions.AllowAny]
+    
+    def list(self, request):
+        queryset = Message.objects.all()
+        serializer = self.serializer_class(queryset, many=True)
+        return Response(serializer.data)
+    
+    def create(self, request):
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        else:
+            return Response(serializer.errors, status=400)
+        
+    def retrieve(self, request, pk=None):
+        project = self.queryset.get(pk=pk)
+        serializer = self.serializer_class(project)
+        return Response(serializer.data)
+    
+
 
 @api_view(['GET'])
 def inbox_view(request):
