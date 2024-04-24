@@ -27,7 +27,6 @@ const refreshAccessToken = async (refreshToken) => {
 
         // Extract the new access token from the response
         const newAccessToken = response.data.access;
-        console.log("In refreshAccessToken")
         // Return the new access token
         return newAccessToken;
     } catch (error) {
@@ -37,7 +36,6 @@ const refreshAccessToken = async (refreshToken) => {
 }; 
 
 const isTokenExpired = (token) => {
-    console.log("In istokenexpired")
     if (!token) {
         return true;
     }
@@ -56,8 +54,6 @@ axiosInstance.interceptors.request.use(
         const user = JSON.parse(localStorage.getItem("user"));
         const accessToken = user ? user.access : null;
         const refreshToken = user ? user.refresh : null;
-        console.log(accessToken, refreshToken)
-        console.log("In interceptor")
         const isExpired = isTokenExpired(accessToken);
         console.log(isExpired)
         if (isExpired && refreshToken) {

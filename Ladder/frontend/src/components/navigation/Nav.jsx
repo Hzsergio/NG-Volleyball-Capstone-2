@@ -56,6 +56,7 @@ const Nav = () => {
                     </Dropdown.Header>
                     <Dropdown.Item href="/dashboard">Dashboard</Dropdown.Item>
                     <Dropdown.Item href="/myprofile">Profile</Dropdown.Item>
+                    
                     <Dropdown.Divider />
                     <Dropdown.Item href="/" onClick={handleLogout} >Sign out</Dropdown.Item>
                 </Dropdown>
@@ -67,6 +68,8 @@ const Nav = () => {
                 </Navbar.Link>
                 <Navbar.Link href="/divisions">Divisions</Navbar.Link>
                 <Navbar.Link href="/allteams">Teams</Navbar.Link>
+                <Navbar.Link href="/test">Test</Navbar.Link>
+
             </Navbar.Collapse>
         </Navbar>
     );

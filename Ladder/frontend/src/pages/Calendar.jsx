@@ -14,7 +14,7 @@ const CreateChallenge = ({ name, team1, team2 }) => {
   const [scheduleData, setScheduleData] = useState({
     date: "",
     time: "",
-    location: name.defaultLocation || "",
+    location: "",
     description: "",
     match: "",
   });
@@ -32,20 +32,7 @@ const CreateChallenge = ({ name, team1, team2 }) => {
       }
     };
 
-    const fetchTeamDetails = async () => {
-      try {
-        const response = await axios.get(
-          `http://localhost:8000/team/${team2}/`
-        );
-        console.log("Team Details API response:", response.data);
-        setTeamDetails(response.data);
-      } catch (error) {
-        console.error("Error fetching team details:", error);
-      }
-    };
-
     fetchDivisionDetails();
-    fetchTeamDetails();
     dispatch(getUserInfo());
   }, [name, dispatch]);
 
@@ -96,14 +83,14 @@ const CreateChallenge = ({ name, team1, team2 }) => {
 
   const createSchedule = async () => {
     // Create CourtSchedule object with location and match detail
-
+    console.log("Schedule Data", scheduleData)
     try {
       // Sending challenge request to the server
       const scheduleResponse = await axios.post(
         "http://localhost:8000/CourtSchedule/",
         {
           match: matchID, // Use matchID passed as prop
-          location: scheduleData.location || "", // Use location if provided, otherwise empty string
+          location: divisionDetails.defaultLocation,
           startTime: new Date(scheduleData.date + " " + scheduleData.time), // Convert dayjs object to JavaScript Date object
           matchDetail: scheduleData.description || "", // Use match detail if provided, otherwise empty string
         }
@@ -117,7 +104,7 @@ const CreateChallenge = ({ name, team1, team2 }) => {
     // Close the modal after creating schedule
     document.getElementById("my_modal_1").close();
     toast.success("Challenge Created Successfully");
-    navigate("/dashboard"); // Optionally navigate to another page
+    // navigate("/dashboard"); // Optionally navigate to another page
   };
 
   const closeModal = () => {

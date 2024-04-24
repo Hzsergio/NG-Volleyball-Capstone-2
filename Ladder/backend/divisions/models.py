@@ -14,6 +14,7 @@ class Division(models.Model):
     category = models.TextField(blank=True, null=True)
     defaultLocation = models.TextField(blank=True, null=True)
     group_settings = models.JSONField(default=dict)
+    challengeDistance = models.IntegerField(default=1)
 
     TOURNAMENT_TYPE_CHOICES = [
         ('single', 'Single'),
