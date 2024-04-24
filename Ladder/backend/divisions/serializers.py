@@ -47,8 +47,8 @@ class MatchTableSerializer(serializers.ModelSerializer):
 
     def get_wins(self, obj):
         team = obj.team
-        team1Wins = MatchTable.objects.filter(team1Name=team, team1Wins__gt=F('team2Wins')).count()
-        team2Wins = MatchTable.objects.filter(team2Name=team, team2Wins__gt=F('team1Wins')).count()
+        team1Wins = MatchTable.objects.filter(team1Name=team,winner = 0).count()
+        team2Wins = MatchTable.objects.filter(team2Name=team,winner = 1).count()
         totalWins = team1Wins + team2Wins
         return totalWins
     
@@ -70,4 +70,4 @@ class MatchTableSerializer(serializers.ModelSerializer):
         if totalGames == 0:
             return 0
         
-        return wins / totalGames
+    #     return wins / totalGames

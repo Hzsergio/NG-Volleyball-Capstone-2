@@ -75,21 +75,21 @@ class Tree:
         self.positionNum = 0
         self.available = 0
         self.leafAmount = 1
-
+    
     def CalculateWinRate(self,TeamList):#total wins/total games
         team_win_rates = defaultdict(float)
 
         for teamInDivision in TeamList:
             team = teamInDivision.team #foreign key to team table
             #----------getting the total games---------------------------------
-            totalGameTeam1 = MatchTable.objects.filter(team1Name =team).count()
-            totalGameTeam2 = MatchTable.objects.filter(team2Name =team).count()
+            totalGameTeam1 = MatchTable.objects.filter(team1Name =team,winner__in=[0, 1],status='f').count()
+            totalGameTeam2 = MatchTable.objects.filter(team2Name =team,winner__in=[0, 1],status='f').count()
             totalGames = totalGameTeam1 + totalGameTeam2
 
             #--------------Getting total wins------------------------------------
             # Count wins by checking name and if team has higher score than other team on same row
-            team1Wins = MatchTable.objects.filter(team1Name=team, team1Wins__gt=F('team2Wins')).count()
-            team2Wins = MatchTable.objects.filter(team2Name=team, team2Wins__gt=F('team1Wins')).count()
+            team1Wins = MatchTable.objects.filter(team1Name=team, winner = 0).count()
+            team2Wins = MatchTable.objects.filter(team2Name=team, winner = 1).count()
             totalWins = team1Wins + team2Wins
 
             #---------------calculating the win rate------------------------------
@@ -352,18 +352,18 @@ class TeamInDivisionView(viewsets.ViewSet):
         team_in_division.delete()
         return Response({'message': f'Team {team_name} left division {division_name} successfully.'}, status=status.HTTP_200_OK)
     
-
+    
     def order_teams_by_win_rate(self, team_list):
         # Calculate win rate for each team
         team_win_rates = {}
         for team_in_division in team_list:
             team = team_in_division.team
-            total_games_team1 = MatchTable.objects.filter(team1Name=team).count()
-            total_games_team2 = MatchTable.objects.filter(team2Name=team).count()
+            total_games_team1 = MatchTable.objects.filter(team1Name =team,winner__in=[0, 1],status='f').count()
+            total_games_team2 = MatchTable.objects.filter(teamwName =team,winner__in=[0, 1],status='f').count()
             total_games = total_games_team1 + total_games_team2
 
-            team1_wins = MatchTable.objects.filter(team1Name=team, team1Wins__gt=F('team2Wins')).count()
-            team2_wins = MatchTable.objects.filter(team2Name=team, team2Wins__gt=F('team1Wins')).count()
+            team1_wins = MatchTable.objects.filter(team1Name=team, winner = 0).count()
+            team2_wins = MatchTable.objects.filter(team2Name=team, winner = 1).count()
             total_wins = team1_wins + team2_wins
 
             if total_games > 0:
@@ -374,7 +374,7 @@ class TeamInDivisionView(viewsets.ViewSet):
             team_win_rates[team] = win_rate
 
         # Sort teams based on win rate
-        sorted_teams = sorted(team_list, key=lambda team: team_win_rates[team.team], reverse=True)
+        sorted_teams = sorted(team_list, key=lambda team: team_win_rates[team.team])
 
         # Assign positions
         for i, team in enumerate(sorted_teams):
