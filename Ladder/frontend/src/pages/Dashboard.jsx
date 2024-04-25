@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import { getUserInfo } from '../features/auth/authSlice'; // Import the getUserInfo action
 import GetChallenges from '../components/GetChallenges';
 import GetTeams from '../components/GetTeams';
+import GetUserDivisions from '../components/GetUserDivisions';
 
 
 
@@ -44,8 +45,11 @@ const Dashboard = () => {
 
       <hr
         class="my-12 h-px border-t-0 bg-transparent bg-gradient-to-r from-transparent via-neutral-500 to-transparent opacity-25 dark:via-neutral-500" />
-
-      <h1 className='nameofpage'> My Teams</h1> {/* Use userInfo && userInfo.first_name to avoid rendering before userInfo is available */}
+      <h1 className='nameofpage'> My Divisions</h1> 
+      <GetUserDivisions/>
+      <hr
+        class="my-12 h-px border-t-0 bg-transparent bg-gradient-to-r from-transparent via-neutral-500 to-transparent opacity-25 dark:via-neutral-500" />
+      <h1 className='nameofpage'> My Teams</h1> 
       <GetTeams  userInfo={userInfo}/>
       <div className='flex justify-center py-5'>
       <Link to="/createteam">

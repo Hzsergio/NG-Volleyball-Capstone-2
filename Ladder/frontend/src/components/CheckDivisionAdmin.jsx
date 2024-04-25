@@ -6,6 +6,7 @@ import { Link } from "react-router-dom";
 function CheckDivisionAdmin({ divisionName, userId }) {
   const [isAdmin, setIsAdmin] = useState(null);
   const [error, setError] = useState("");
+  const [divisionDetails, setDivisionDetails] = useState({});
 
   useEffect(() => {
     const fetchAdminStatus = async () => {
@@ -22,20 +23,19 @@ function CheckDivisionAdmin({ divisionName, userId }) {
     };
 
     fetchAdminStatus();
+    fetchDivisionDetails();
   }, [divisionName, userId]);
 
-  const handleAssignPositions = async () => {
+  const fetchDivisionDetails = async () => {
     try {
-      await axios.post(
-        `http://localhost:8000/teamindivision/assign-positions/${divisionName}/`
+      const divisionResponse = await axios.get(
+        `http://localhost:8000/division/${divisionName}/`
       );
-      setError("");
-      // Optionally, you can perform additional actions after successful assignment
-      console.log("Positions assigned successfully.");
-      toast.success("Started Division");
+      setDivisionDetails(divisionResponse.data);
     } catch (error) {
-      setError("Error assigning positions");
+      console.error("Error fetching division details:", error);
     }
+
   };
 
   return (
@@ -43,7 +43,7 @@ function CheckDivisionAdmin({ divisionName, userId }) {
       <div>
         <div className="sm:hidden">
           <label htmlFor="tabs" className="sr-only">
-            Select your country
+            Hello
           </label>
           <select
             id="tabs"
@@ -56,6 +56,16 @@ function CheckDivisionAdmin({ divisionName, userId }) {
           </select>
         </div>
         <ul className="hidden text-sm font-medium text-center text-gray-500 rounded-lg shadow sm:flex dark:divide-gray-700 dark:text-gray-400">
+        {divisionDetails.tournament_type === "group" && (
+        <li className="w-full focus-within:z-10">
+          <Link
+            to={`/division/${divisionName}/ladder`}
+            className="inline-block w-full p-4 bg-white border-s-0 border-gray-200 dark:border-gray-700 rounded-e-lg hover:text-gray-700 hover:bg-gray-50 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:hover:text-white dark:bg-gray-800 dark:hover:bg-gray-700"
+          >
+            Groups
+          </Link>
+        </li>
+      )}
           <li className="w-full focus-within:z-10">
             <Link
               to={`/division/${divisionName}`}

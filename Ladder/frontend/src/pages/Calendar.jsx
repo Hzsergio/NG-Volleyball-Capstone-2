@@ -62,6 +62,7 @@ const CreateChallenge = ({ name, team1, team2 }) => {
           ref: divisionDetails.admin,
           countDown: new Date().toISOString().split("T")[0],
           status: "s",
+  
         }
       );
 

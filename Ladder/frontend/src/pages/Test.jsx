@@ -19,7 +19,7 @@ import Inbox from "./Inbox";
 import GetUserDivisions from "../components/GetUserDivisions";
 import { useSelector, useDispatch } from 'react-redux';
 import { getUserInfo } from '../features/auth/authSlice'; // Import the getUserInfo action
-
+import { HiMenu } from "react-icons/hi";
 
 
 const Test = ({ name, team1, team2 }) => {
@@ -27,7 +27,11 @@ const Test = ({ name, team1, team2 }) => {
   const [selectedLink, setSelectedLink] = useState(null);
   const { userInfo } = useSelector((state) => state.auth);
   const dispatch = useDispatch(); 
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
+  const toggleSidebar = () => {
+    setIsSidebarOpen(!isSidebarOpen);
+  };
   const handleClose = () => setIsOpen(false);
   const handleLinkClick = (link) => {
     setSelectedLink(link);
@@ -40,9 +44,14 @@ const Test = ({ name, team1, team2 }) => {
 
   return (
     <div className="flex flex-col h-screen md:flex-row">
+            <div className="lg:hidden">
+        <button className="btn btn-square" onClick={toggleSidebar}>
+          <HiMenu />
+        </button>
+      </div>
       {/* Sidebar */}
       <div className="w-full md:w-64 bg-gray-200">
-        <Sidebar aria-label="Sidebar with multi-level dropdown example">
+        <Sidebar aria-label="Sidebar with multi-level dropdown" className={isSidebarOpen ? "" : "hidden lg:block"}>
           <Sidebar.Items>
             <Sidebar.ItemGroup>
               <Sidebar.Item icon={HiChartPie}>

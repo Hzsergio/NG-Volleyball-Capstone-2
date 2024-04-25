@@ -70,4 +70,4 @@ class MatchTableSerializer(serializers.ModelSerializer):
         if totalGames == 0:
             return 0
         
-    #     return wins / totalGames
+        return wins / totalGames

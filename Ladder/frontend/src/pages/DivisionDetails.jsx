@@ -7,6 +7,7 @@ import { getUserInfo } from "../features/auth/authSlice"; // Import the getUserI
 import CheckUserCaptain from "../components/CheckUserCaptain"; // Import the CheckUserCaptain component
 import CheckDivisionAdmin from "../components/CheckDivisionAdmin";
 import CustomizedTables from "../components/ranktable";
+import GroupTable from "../components/GroupTable";
 
 const DivisionDetailsPage = () => {
   const [divisionDetails, setDivisionDetails] = useState([]);
@@ -55,8 +56,8 @@ const DivisionDetailsPage = () => {
       <h1>{name} </h1>
 
       <CustomizedTables />
+      <GroupTable />
 
-      {/* Use the CheckUserCaptain component */}
       <CheckUserCaptain
         userId={userInfo.id}
         divisionName={name}

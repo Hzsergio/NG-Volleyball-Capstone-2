@@ -27,6 +27,9 @@ import ManageMatches from "./pages/ManageMatches";
 import Test from "./pages/Test";
 import DivisionSettings from "./pages/DivisionSettings";
 import ManageParticipants from "./pages/ManageParticipants"
+import GroupTable from "./pages/GroupTable"
+
+
 
 function App() {
   return (
@@ -63,6 +66,8 @@ function App() {
             <Route path="/managematches/:divisionName" element={<ManageMatches />} />
             <Route path="/division/settings/:divisionName" element={<DivisionSettings />} />
             <Route path="/division/manageteams/:divisionName" element={<ManageParticipants />} />
+            <Route path="/division/:divisionName/ladder" element={<GroupTable />} />
+
 
 
           </Route>

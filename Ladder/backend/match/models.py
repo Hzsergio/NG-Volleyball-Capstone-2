@@ -11,8 +11,8 @@ class MatchTable(models.Model):
     ref = models.ForeignKey(User,on_delete=models.CASCADE,null=True)
     countDown = models.DateField(null=True)
 
-    scores = models.JSONField(default=dict,null=True)
-    winner = models.IntegerField(null=True)#0: if challenger win    1: if recipient win  2: if tie
+    scores = models.JSONField(default=dict,blank=True, null=True)
+    winner = models.IntegerField(blank=True,null=True)#0: if challenger win    1: if recipient win  2: if tie
 
     class Status(models.TextChoices):
        INPROGRESS = 'i', 'inProgress' 

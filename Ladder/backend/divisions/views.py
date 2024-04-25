@@ -394,3 +394,62 @@ class TeamInDivisionView(viewsets.ViewSet):
             team.save()
 
         return Response({'message': 'Positions assigned successfully.'})
+
+    def order_teams_by_group_settings(self, team_list, group_settings):
+        # Convert group_settings to a list of tuples sorted by key (level)
+        sorted_settings = sorted(group_settings.items(), key=lambda x: int(x[0]) if x[0].isdigit() else float('inf'))
+        # Assign positions based on group settings
+        number_of_teams = len(team_list)
+        total_teams_assigned = 0
+        current_position = 1
+
+        for level, teams in sorted_settings:
+            if level.isdigit():
+                teams = int(teams)
+                teams_assigned = 0  # Counter to track how many teams have been assigned positions for the current level
+                for _ in range(teams):
+                    # Assign the current_position to the next team
+                    team_list[total_teams_assigned].position = current_position
+
+                    teams_assigned += 1
+                    total_teams_assigned += 1
+                    if total_teams_assigned == number_of_teams:
+                        break
+                    if teams_assigned == teams:
+                        # Increment current_position only when all teams for the current level have been assigned positions
+                        current_position += 1
+
+        # Handle the 'default' key if present
+        default_teams = group_settings.get('default')
+        if default_teams:
+            default_teams = int(default_teams)
+            teams_assigned = 0
+            for _ in range(default_teams):
+                # Assign the current_position to the next team
+                team_list[total_teams_assigned].position = current_position
+                teams_assigned += 1
+                total_teams_assigned += 1
+                if total_teams_assigned == number_of_teams:
+                        break
+                if teams_assigned == teams:
+                    current_position += 1
+
+
+
+
+    @action(detail=False, methods=['POST'], url_path='group-assign-positions/(?P<division_name>[^/.]+)')
+    def group_assign_positions(self, request, division_name=None):
+        division = get_object_or_404(Division, name=division_name)
+        team_list = list(TeamInDivision.objects.filter(division=division))
+
+        # Access group settings from the division instance
+        group_settings = division.group_settings
+
+        # Call order_teams_by_group_settings method with the queryset and group settings
+        self.order_teams_by_group_settings(team_list, group_settings)
+
+        # Save each team object to the database
+        for team in team_list:
+            team.save()
+
+        return Response({'message': 'Positions assigned successfully.'})
