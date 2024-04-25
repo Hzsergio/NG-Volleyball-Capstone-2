@@ -11,7 +11,7 @@ from collections import defaultdict
 import json
 from django.http import JsonResponse
 from .models import *
-from django.db.models import Q, F
+from django.db.models import Q, F, Case, When, IntegerField
 from django.http import JsonResponse
 
 
@@ -85,18 +85,22 @@ class MatchTableView(viewsets.ViewSet):
         serializer = self.serializer_class(match_result, many=True)#, exclude=['id', 'countDown'])
         return Response(serializer.data)
     
- 
-    @action(detail=False, methods=['GET'], url_path=r'table_view/(?P<team_name>[^/.]+)')
-    def table_view(self, request, team_name=None):
+    #make the team_name also optional to seach through division for everyones info
+    @action(detail=False, methods=['GET'], url_path=r'table_view/(?P<team_name>[^/.]+)(?:/(?P<division_name>[^/.]+))?')
+    def table_view(self, request, team_name=None, division_name = None):
         team = get_object_or_404(Team, name=team_name)
         
+        if division_name:
+            division404 = get_object_or_404(Division, name=division_name)
+            matches = MatchTable.objects.filter(division = division404)
+            total_wins = MatchTable.objects.filter(division = division404)
         #get total matches
         matches = MatchTable.objects.filter(Q(team1Name=team) | Q(team2Name=team), status=MatchTable.Status.FINISHED)
         total_games = matches.count()
 
         #to get wins and loses
-        total_wins = matches.filter(team1Name=team, team1Wins__gt=F('team2Wins')).count() + \
-                     matches.filter(team2Name=team, team2Wins__gt=F('team1Wins')).count()
+        total_wins = matches.filter(team1Name =team,winner = 0,status='f').count() + \
+                     matches.filter(team2Name=team, winner = 1,status = 'f').count()
         total_losses = total_games - total_wins
 
         # Calculate win rate
@@ -115,6 +119,7 @@ class MatchTableView(viewsets.ViewSet):
 
         return Response(response_data)
     
+    #need to fix this
     @action(detail=False, methods=['POST'], url_path=r'submit-results/(?P<match_id>[^/.]+)')
     def submit_results(self, request, match_id=None):
         try:
@@ -171,7 +176,22 @@ class MatchTableView(viewsets.ViewSet):
         user_matches = MatchTable.objects.filter(
             Q(team1Name__in=user_teams) | Q(team2Name__in=user_teams)
         )
-        
+
+        # Define a custom ordering based on status
+        status_ordering = Case(
+            When(status='s', then=0),
+            When(status='i', then=1),
+            When(status='r', then=2),
+            When(status='f', then=3),
+            default=4,
+            output_field=IntegerField(),
+        )
+
+        # Sort the matches based on status ordering
+        user_matches = user_matches.annotate(
+            status_order=status_ordering
+        ).order_by('status_order')
+
         # Serialize the matches
         serializer = self.serializer_class(user_matches, many=True)
         
@@ -227,6 +247,18 @@ class CourtScheduleView(viewsets.ViewSet):
         project = self.queryset.get(pk=pk)
         serializer = self.serializer_class(project)
         return Response(serializer.data)
+
+    def put(self, request, pk, format=None):
+        try:
+            instance = CourtSchedule.objects.get(pk=pk)
+        except CourtSchedule.DoesNotExist:
+            return Response({"error": "CourtSchedule not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = CourtScheduleSerializer(instance, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     @action(detail=False, methods=['GET'], url_path=r'match-court/(?P<match_id>\d+)')
     def get_court_schedule(self, request, match_id=None):

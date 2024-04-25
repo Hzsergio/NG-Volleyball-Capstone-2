@@ -1,4 +1,7 @@
 import axios from "axios"
+import { jwtDecode } from "jwt-decode";
+import dayjs from 'dayjs';
+import { isPending } from "@reduxjs/toolkit";
 
 const BACKEND_DOMAIN = "http://localhost:8000"
 
@@ -10,103 +13,146 @@ const RESET_PASSWORD_CONFIRM_URL = `${BACKEND_DOMAIN}/api/v1/auth/users/reset_pa
 const GET_USER_INFO = `${BACKEND_DOMAIN}/api/v1/auth/users/me/`
 
 
+// Create a new Axios instance
+const axiosInstance = axios.create({
+    baseURL: BACKEND_DOMAIN,
+    headers: {
+        "Content-type": "application/json"
+    }
+});
+const refreshAccessToken = async (refreshToken) => {
+    try {
+        // Make a request to your backend to refresh the access token using the refresh token
+        const response = await axios.post(`${BACKEND_DOMAIN}/api/v1/auth/jwt/refresh/`, { refresh: refreshToken });
+
+        // Extract the new access token from the response
+        const newAccessToken = response.data.access;
+        // Return the new access token
+        return newAccessToken;
+    } catch (error) {
+        // If token refresh fails, throw an error
+        throw new Error("Failed to refresh access token");
+    }
+}; 
+
+const isTokenExpired = (token) => {
+    if (!token) {
+        return true;
+    }
+
+    const decodedToken = jwtDecode(token);
+    if (!decodedToken || !decodedToken.exp) {
+        return true;
+    }
+
+    const currentTime = Math.floor(Date.now() / 1000);
+    return decodedToken.exp < currentTime;
+};
+
+axiosInstance.interceptors.request.use(
+    async (config) => {
+        const user = JSON.parse(localStorage.getItem("user"));
+        const accessToken = user ? user.access : null;
+        const refreshToken = user ? user.refresh : null;
+        const isExpired = isTokenExpired(accessToken);
+        console.log(isExpired)
+        if (isExpired && refreshToken) {
+            try {
+                const newAccessToken = await refreshAccessToken(refreshToken);
+                user.access = newAccessToken;
+                localStorage.setItem("user", JSON.stringify(user));
+                config.headers.Authorization = `Bearer ${newAccessToken}`;
+            } catch (error) {
+                console.error("Failed to refresh access token:", error);
+                localStorage.removeItem("user");
+                throw error;
+            }
+        }
+
+        return config;
+    },
+    (error) => {
+        return Promise.reject(error);
+    }
+);
+
+
+
 
 // Register user
-
 const register = async (userData) => {
-    const config = {
-        headers: {
-            "Content-type": "application/json"
-        }
+    try {
+        const response = await axiosInstance.post("/api/v1/auth/users/", userData);
+        return response.data;
+    } catch (error) {
+        throw new Error("Failed to register user");
     }
-
-    const response = await axios.post(REGISTER_URL, userData, config)
-
-    return response.data
-}
+};
 
 // Login user
-
 const login = async (userData) => {
-    const config = {
-        headers: {
-            "Content-type": "application/json"
+    try {
+        const response = await axiosInstance.post("/api/v1/auth/jwt/create/", userData);
+        if (response.data) {
+            localStorage.setItem("user", JSON.stringify(response.data));
         }
+        return response.data;
+    } catch (error) {
+        throw new Error("Failed to login user");
     }
-
-    const response = await axios.post(LOGIN_URL, userData, config)
-
-    if (response.data) {
-        localStorage.setItem("user", JSON.stringify(response.data))
-    }
-
-    return response.data
-}
+};
 
 // Logout 
-
 const logout = () => {
-    return localStorage.removeItem("user")
-}
+    localStorage.removeItem("user");
+};
 
 // Activate user
-
 const activate = async (userData) => {
-    const config = {
-        headers: {
-            "Content-type": "application/json"
-        }
+    try {
+        const response = await axiosInstance.post("/api/v1/auth/users/activation/", userData);
+        return response.data;
+    } catch (error) {
+        throw new Error("Failed to activate user");
     }
-
-    const response = await axios.post(ACTIVATE_URL, userData, config)
-
-    return response.data
-}
+};
 
 // Reset Password
-
 const resetPassword = async (userData) => {
-    const config = {
-        headers: {
-            "Content-type": "application/json"
-        }
+    try {
+        const response = await axiosInstance.post("/api/v1/auth/users/reset_password/", userData);
+        return response.data;
+    } catch (error) {
+        throw new Error("Failed to reset password");
     }
-
-    const response = await axios.post(RESET_PASSWORD_URL, userData, config)
-
-    return response.data
-}
+};
 
 // Reset Password
-
 const resetPasswordConfirm = async (userData) => {
-    const config = {
-        headers: {
-            "Content-type": "application/json"
-        }
+    try {
+        const response = await axiosInstance.post("/api/v1/auth/users/reset_password_confirm/", userData);
+        return response.data;
+    } catch (error) {
+        throw new Error("Failed to reset password");
     }
-
-    const response = await axios.post(RESET_PASSWORD_CONFIRM_URL, userData, config)
-
-    return response.data
-}
+};
 
 // Get User Info
-
 const getUserInfo = async (accessToken) => {
-    const config = {
-        headers: {
-            "Authorization": `Bearer ${accessToken}`
-        }
+    try {
+        const config = {
+            headers: {
+                "Authorization": `Bearer ${accessToken}`
+            }
+        };
+        const response = await axiosInstance.get("/api/v1/auth/users/me/", config);
+        return response.data;
+    } catch (error) {
+        throw new Error("Failed to get user info");
     }
+};
 
-    const response = await axios.get(GET_USER_INFO, config)
+// Define authentication functions
+const authService = { register, login, logout, activate, resetPassword, resetPasswordConfirm, getUserInfo };
 
-    return response.data
-}
-
-
-
-const authService = { register, login, logout, activate, resetPassword, resetPasswordConfirm, getUserInfo }
-
-export default authService
+export default authService;

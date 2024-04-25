@@ -10,19 +10,17 @@ class MatchTable(models.Model):
     division = models.ForeignKey(Division, on_delete=models.CASCADE, null=True)
     ref = models.ForeignKey(User,on_delete=models.CASCADE,null=True)
     countDown = models.DateField(null=True)
-    team1Wins = models.IntegerField(default=0)
-    team2Wins = models.IntegerField(default=0)
-    
+
+    scores = models.JSONField(default=dict,blank=True, null=True)
+    winner = models.IntegerField(blank=True,null=True)#0: if challenger win    1: if recipient win  2: if tie
+
     class Status(models.TextChoices):
-       SCHEDULED = 's', 'scheduled'
        INPROGRESS = 'i', 'inProgress' 
-       REPORTED = 'r', 'reported'
-       FINISHED = 'f', 'finished'
+       SCHEDULED = 's', 'scheduled'
        VOID = 'v', 'void'
+       FINISHED = 'f', 'finished'
     status = models.CharField(max_length=1,choices=Status.choices,null=True)
 
-    
-    
     def __str__(self):
         return f"{self.team1Name} vs {self.team2Name} in {self.division}"
 

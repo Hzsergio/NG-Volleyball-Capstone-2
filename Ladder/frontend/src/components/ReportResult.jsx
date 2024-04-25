@@ -4,15 +4,13 @@ import { toast } from 'react-toastify'
 import { useSelector, useDispatch } from "react-redux";
 import { getUserInfo } from "../features/auth/authSlice";
 
-function SubmitResults({ selectedMatch }) {
+function ReportResult({ selectedMatch }) {
   const { userInfo } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
   const [teamScores, setTeamScores] = useState({
-    team1: selectedMatch.team1Wins|| '',
-    team2: selectedMatch.team2Wins || ''
+    team1: '',
+    team2: ''
   });
-
-
 
   // Function to handle score input changes
   const handleScoreChange = (team, score) => {
@@ -40,7 +38,7 @@ function SubmitResults({ selectedMatch }) {
       const response = await axios.post(`http://localhost:8000/MatchTable/submit-results/${selectedMatch.id}/`, {
         team1Wins: parseInt(teamScores.team1),
         team2Wins: parseInt(teamScores.team2),
-        status: 'f'
+        status: 'r'
       });
 
       // Log the response
@@ -58,9 +56,9 @@ function SubmitResults({ selectedMatch }) {
 
   return (
     <div >
-      <button className="btn btn-primary" onClick={() => document.getElementById('my_modal_1').showModal()}>Report Score</button>
+      <button className="btn btn-primary" onClick={() => document.getElementById('my_modal_2').showModal()}>Report Score</button>
 
-      <dialog id="my_modal_1" className="modal">
+      <dialog id="my_modal_2" className="modal">
         <div className="modal-box">
           <h3 className="font-bold text-lg">Report Score</h3>
           <div >
@@ -99,4 +97,4 @@ function SubmitResults({ selectedMatch }) {
   );
 }
 
-export default SubmitResults;
+export default ReportResult;

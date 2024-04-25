@@ -15,8 +15,6 @@ const TeamDetailsPage = () => {
   const navigate = useNavigate()
   const dispatch = useDispatch(); // Get the dispatch function
 
-
-
   useEffect(() => {
     const fetchTeamDetails = async () => {
       setLoading(true);
@@ -43,7 +41,6 @@ const TeamDetailsPage = () => {
       // Update team details after joining
       setTeamDetails(response.data);
       toast.success("Successfully joined")
-
       navigate("/dashboard")
     } catch (error) {
       console.error('Error joining team:', error);
@@ -59,14 +56,14 @@ const TeamDetailsPage = () => {
     return <div>{error}</div>;
   }
 
+  // Filter out the captain from the list of team members if teamDetails exists
+  const membersWithoutCaptain = teamDetails && teamDetails.member_usernames ? teamDetails.member_usernames.filter(username => username !== teamDetails.captain_username) : [];
+
   return (
     <div>
       <div class="flex justify-center mt-4">
-      <h1 className='nameofpage'>{teamDetails.name} Details</h1>
-
+        <h1 className='nameofpage'>{teamDetails.name} Details</h1>
       </div>
-
-
       <div class="max-w-2xl mx-auto ">
         <div class="p-4 max-w-md bg-white rounded-lg border shadow-md sm:p-8 dark:bg-gray-800 dark:border-gray-700">
           <div class="flex justify-between items-center mb-4">
@@ -79,14 +76,17 @@ const TeamDetailsPage = () => {
                   <div class="flex-shrink-0">
                     <img class="w-16 h-16 rounded-full" src="https://flowbite.com/docs/images/people/profile-picture-1.jpg" alt="Captain image" />
                   </div>
-                  <div class="flex-1 min-w-0">
+                  <div class="flex-1 min-w-0"> Captain
                     <p class="text-sm font-medium text-gray-900 truncate dark:text-white">
-                      Captain: {teamDetails.captain_username}
+                      {teamDetails.captain_username}
                     </p>
                   </div>
                 </div>
               </li>
-              {teamDetails.member_usernames && teamDetails.member_usernames.map(username => (
+              <div className="flex flex-col w-full">
+                <div className="divider"></div>
+              </div>
+              {membersWithoutCaptain.map(username => (
                 <li key={username} class="py-3 sm:py-4">
                   <div class="flex items-center space-x-4">
                     <div class="flex-shrink-0">
@@ -94,7 +94,7 @@ const TeamDetailsPage = () => {
                     </div>
                     <div class="flex-1 min-w-0">
                       <p class="text-sm font-medium text-gray-900 truncate dark:text-white">
-                        Member: {username}
+                        {username}
                       </p>
                     </div>
                   </div>
@@ -106,13 +106,7 @@ const TeamDetailsPage = () => {
       </div>
       <div class="flex justify-center mt-4">
         <button className="btn btn-primary" onClick={handleJoinTeam}>Join Team</button>
-
       </div>
-
-
-
-
-
     </div>
   );
 };
