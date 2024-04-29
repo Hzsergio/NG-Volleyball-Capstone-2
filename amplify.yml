@@ -9,8 +9,9 @@ applications:
         build:
           commands:
             - npm run build
+            - ls -al 
       artifacts:
-        baseDirectory: NG-Volleyball-Capstone-2/Ladder/frontend/dist
+        baseDirectory: Ladder/frontend/dist
         files:
           - '**/*'
       cache:
