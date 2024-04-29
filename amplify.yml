@@ -1,10 +1,10 @@
 version: 1
 applications:
   - frontend:
-      baseDirectory: NG-Volleyball-Capstone-2/Ladder/frontend
       phases:
         preBuild:
           commands:
+            - cd NG-Volleyball-Capstone-2/Ladder/frontend
             - npm install
         build:
           commands:
